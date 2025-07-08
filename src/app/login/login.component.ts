@@ -5,10 +5,11 @@ import { AuthService } from '../service/auth.service';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-login',
-  imports: [MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardContent, MatFormField, MatLabel, FormsModule, MatCardActions, MatInputModule],
+  imports: [CommonModule, MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardContent, MatFormField, MatLabel, FormsModule, MatCardActions, MatInputModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
@@ -17,14 +18,12 @@ export class Login {
   password = signal<string>('');
   errorMessage = signal<string>('');
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) { }
 
-  onSubmit(): void{
-    console.info('Username is:' + this.username());
-    console.info('Password is:' + this.password());
-    if(this.authService.login(this.username(), this.password())){
+  onSubmit(): void {
+    if (this.authService.login(this.username(), this.password())) {
       this.errorMessage.set('');
-    }else {
+    } else {
       this.errorMessage.set('Invalid credentials. Use admin');
     }
   }

@@ -16,6 +16,10 @@
                     name="password" required autocomplete="current-password" />
             </mat-form-field>
 
+            <div class="error-message" *ngIf="errorMessage()">
+                {{errorMessage()}}
+            </div>
+
             <button mat-raised-button color="primary" type="submit">Login</button>
         </form>
     </mat-card-content>
