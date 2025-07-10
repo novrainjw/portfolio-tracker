@@ -19,6 +19,8 @@ export class PortfolioList {
   displayedColumns = ['name', 'broker', 'currency', 'createdDate', 'actions'];
 
   deletePortfolio(id: string): void {
-    this.portfolioService.deletePortfolio(id);
+    if (confirm('Are you sure you want to delete this portfolio? All holdings will be deleted.')) {
+      this.portfolioService.deletePortfolio(id);
+    }
   }
 }

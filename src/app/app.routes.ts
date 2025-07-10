@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { Login } from './login/login.component';
 import { Dashboard } from './dashboard/dashboard.component';
 import { PortfolioList } from './portfolio-list/portfolio-list.component';
+import { PortfolioForm } from './portfolio-form/portfolio-form.component';
 
 export const routes: Routes = [
     {
@@ -20,6 +21,10 @@ export const routes: Routes = [
             {
                 path:'',
                 component:PortfolioList
+            },
+            {
+                path:'new',
+                component:PortfolioForm
             }
         ]
     }
