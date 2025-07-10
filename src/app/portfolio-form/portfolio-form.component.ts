@@ -16,7 +16,7 @@ import { MatIconModule } from '@angular/material/icon';
   templateUrl: './portfolio-form.component.html',
   styleUrl: './portfolio-form.component.scss'
 })
-export class PortfolioForm implements OnInit {
+export class PortfolioFormComponent implements OnInit {
   portfolioService = inject(PortfolioService);
   router = inject(Router)
   route = inject(ActivatedRoute);

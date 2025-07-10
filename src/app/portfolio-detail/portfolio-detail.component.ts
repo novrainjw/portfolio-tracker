@@ -31,35 +31,35 @@ export class PortfolioDetailComponent {
   portfolioService = inject(PortfolioService);
   router = inject(Router);
   route = inject(ActivatedRoute);
-  
+
   portfolioId = signal<string | null>(null);
   portfolio = computed(() => {
     const id = this.portfolioId();
     return id ? this.portfolioService.getPortfolioById(id) : null;
   });
-  
+
   holdings = computed(() => {
     const portfolio = this.portfolio();
-    return portfolio 
+    return portfolio
       ? this.portfolioService.holdings().filter(h => h.portfolioId === portfolio.id)
       : [];
   });
-  
+
   holdingColumns = ['symbol', 'name', 'quantity', 'avgPrice', 'currentPrice', 'value', 'gainLoss'];
 
   portfolioSummary = computed(() => {
     const holdings = this.holdings();
     let totalValue = 0;
     let totalCost = 0;
-    
+
     holdings.forEach(h => {
       totalValue += h.quantity * h.currentPrice;
       totalCost += h.quantity * h.averagePrice;
     });
-    
+
     const totalGainLoss = totalValue - totalCost;
     const gainLossPercentage = totalCost > 0 ? (totalGainLoss / totalCost) * 100 : 0;
-    
+
     return {
       totalValue,
       totalCost,

@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import { Login } from './login/login.component';
 import { Dashboard } from './dashboard/dashboard.component';
 import { PortfolioList } from './portfolio-list/portfolio-list.component';
-import { PortfolioForm } from './portfolio-form/portfolio-form.component';
+import { PortfolioFormComponent } from './portfolio-form/portfolio-form.component';
 import { PortfolioDetailComponent } from './portfolio-detail/portfolio-detail.component';
 
 export const routes: Routes = [
@@ -18,18 +18,28 @@ export const routes: Routes = [
     },
     {
         path: 'portfolios',
-        children:[
+        children: [
             {
-                path:'',
-                component:PortfolioList
+                path: '',
+                component: PortfolioList
             },
             {
-                path:'new',
-                component:PortfolioForm
+                path: 'new',
+                component: PortfolioFormComponent
             },
             {
-                path:':id',
-                component: PortfolioDetailComponent
+                path: ':id',
+                component: PortfolioDetailComponent,
+                children: [
+                    {
+                        path: 'edit',
+                        component: PortfolioFormComponent
+                    }
+                ]
+            },
+            {
+                path: ':id/edit',
+                component: PortfolioFormComponent
             }
         ]
     }
