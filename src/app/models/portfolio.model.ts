@@ -4,6 +4,14 @@ export interface Portfolio {
     broker: string;
     currency: 'USD' | 'CAD';
     createdDate: Date;
+    description?: string;
+}
+
+export interface PortfolioCreateDto {
+    name: string,
+    broker: string,
+    currency: 'USD' | 'CAD';
+    description?: string;
 }
 
 export interface Holding {

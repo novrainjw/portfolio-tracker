@@ -1,5 +1,7 @@
 import { Injectable, signal } from "@angular/core";
-import { Holding, Portfolio, PortfolioSummary } from "../models/portfolio.model";
+import { Holding, Portfolio, PortfolioCreateDto, PortfolioSummary } from "../models/portfolio.model";
+import { DummyDataPortfolio, DummyHolding } from "../models/dummy-data";
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable({
     providedIn: 'root'
@@ -22,45 +24,10 @@ export class PortfolioService {
 
     private loadDummyData(): void {
         // Dummy portfolios
-        this.portfolios.set([
-            {
-                id: '1',
-                name: 'RRSP Account',
-                broker: 'Questrade',
-                currency: 'USD',
-                createdDate: new Date('2022-01-15')
-            },
-            {
-                id: '2',
-                name: 'TFSA Account',
-                broker: 'Wealthsimple',
-                currency: 'CAD',
-                createdDate: new Date('2021-11-03')
-            },
-            {
-                id: '3',
-                name: 'Personal Account',
-                broker: 'Interactive Brokers',
-                currency: 'USD',
-                createdDate: new Date('2023-02-20')
-            }
-        ]);
+        this.portfolios.set(DummyDataPortfolio);
 
         // Dummy holdings
-        this.holdings.set([
-            // RRSP Holdings (USD)
-            { id: '101', portfolioId: '1', symbol: 'VTI', name: 'Vanguard Total Stock Market ETF', quantity: 25, averagePrice: 220.50, currentPrice: 250.75, currency: 'USD', type: 'ETF' },
-            { id: '102', portfolioId: '1', symbol: 'MSFT', name: 'Microsoft Corporation', quantity: 10, averagePrice: 300.25, currentPrice: 420.50, currency: 'USD', type: 'STOCK' },
-            { id: '103', portfolioId: '1', symbol: 'AAPL', name: 'Apple Inc.', quantity: 15, averagePrice: 150.75, currentPrice: 175.25, currency: 'USD', type: 'STOCK' },
-
-            // TFSA Holdings (CAD)
-            { id: '201', portfolioId: '2', symbol: 'XEQT', name: 'iShares Core Equity ETF', quantity: 100, averagePrice: 25.80, currentPrice: 28.50, currency: 'CAD', type: 'ETF' },
-            { id: '202', portfolioId: '2', symbol: 'ENB', name: 'Enbridge Inc.', quantity: 50, averagePrice: 48.25, currentPrice: 52.75, currency: 'CAD', type: 'STOCK' },
-
-            // Personal Account Holdings (USD)
-            { id: '301', portfolioId: '3', symbol: 'QQQ', name: 'Invesco QQQ Trust', quantity: 20, averagePrice: 350.40, currentPrice: 425.25, currency: 'USD', type: 'ETF' },
-            { id: '302', portfolioId: '3', symbol: 'GOOGL', name: 'Alphabet Inc.', quantity: 5, averagePrice: 125.75, currentPrice: 145.30, currency: 'USD', type: 'STOCK' }
-        ]);
+        this.holdings.set(DummyHolding);
     }
 
     private calculateSummary(): void {
@@ -83,5 +50,44 @@ export class PortfolioService {
             totalGainLoss: totalGainLoss,
             gainLossPercentage: gainLossPercentage
         });
+    }
+
+    addPortfolio(portfolio: PortfolioCreateDto): Portfolio {
+        const newPortfolio: Portfolio = {
+            ...portfolio,
+            id: uuidv4(),
+            createdDate: new Date()
+        };
+
+        this.portfolios.update(portfolio => [...portfolio, newPortfolio]);
+        return newPortfolio;
+    }
+
+    updatePortfolio(id: string, update: Partial<PortfolioCreateDto>): Portfolio | null {
+        let updated: Portfolio | null = null;
+
+        this.portfolios.update(portfolios => {
+            return portfolios.map((item) => {
+                if (item.id === id) {
+                    updated = { ...item, ...update };
+                    return updated;
+                }
+                return item;
+            });
+        });
+
+        return updated;
+    }
+
+    deletePortfolio(id: string): void {
+        this.portfolios.update(portfolios => portfolios.filter(p => p.id !== id));
+
+        // Also remove associated holdings
+        this.holdings.update(holdings => holdings.filter(h => h.portfolioId !== id));
+        this.calculateSummary();
+    }
+
+    getPortfolioById(id: string): Portfolio | undefined {
+        return this.portfolios().find(p => p.id === id);
     }
 }
