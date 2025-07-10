@@ -8,10 +8,11 @@ import { MatSelectModule } from '@angular/material/select';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PortfolioService } from '../service/portfolio.service';
 import { PortfolioCreateDto } from '../models/portfolio.model';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-portfolio-form',
-  imports: [MatCardModule, MatFormFieldModule, ReactiveFormsModule, CommonModule, MatInputModule, MatSelectModule],
+  imports: [MatCardModule, MatFormFieldModule, ReactiveFormsModule, CommonModule, MatInputModule, MatSelectModule, MatIconModule],
   templateUrl: './portfolio-form.component.html',
   styleUrl: './portfolio-form.component.scss'
 })

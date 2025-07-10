@@ -3,6 +3,7 @@ import { Login } from './login/login.component';
 import { Dashboard } from './dashboard/dashboard.component';
 import { PortfolioList } from './portfolio-list/portfolio-list.component';
 import { PortfolioForm } from './portfolio-form/portfolio-form.component';
+import { PortfolioDetailComponent } from './portfolio-detail/portfolio-detail.component';
 
 export const routes: Routes = [
     {
@@ -25,6 +26,10 @@ export const routes: Routes = [
             {
                 path:'new',
                 component:PortfolioForm
+            },
+            {
+                path:':id',
+                component: PortfolioDetailComponent
             }
         ]
     }
