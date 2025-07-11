@@ -5,6 +5,7 @@ import { MatTableModule } from '@angular/material/table';
 import { PortfolioService } from '../service/portfolio.service';
 import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
+import { Holding } from '../models/portfolio.model';
 
 @Component({
   selector: 'app-portfolio-list',

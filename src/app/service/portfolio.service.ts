@@ -1,5 +1,5 @@
 import { Injectable, signal } from "@angular/core";
-import { Holding, Portfolio, PortfolioCreateDto, PortfolioSummary } from "../models/portfolio.model";
+import { Holding, HoldingCreateDto, HoldingUpdateDto, Portfolio, PortfolioCreateDto, PortfolioSummary } from "../models/portfolio.model";
 import { DummyDataPortfolio, DummyHolding } from "../models/dummy-data";
 import { v4 as uuidv4 } from 'uuid';
 
@@ -89,5 +89,50 @@ export class PortfolioService {
 
     getPortfolioById(id: string): Portfolio | undefined {
         return this.portfolios().find(p => p.id === id);
+    }
+
+    addHolding(holding: HoldingCreateDto): Holding {
+        const newHolding: Holding = {
+            ...holding,
+            id: uuidv4(),
+            currentPrice: holding.averagePrice // Initialize with purchase price
+        };
+
+        this.holdings.update(holdings => [...holdings, newHolding]);
+        this.calculateSummary();
+        return newHolding;
+    }
+
+    updateHolding(id: string, update: HoldingUpdateDto): Holding | null {
+        let updated: Holding | null = null;
+
+        this.holdings.update(holdings =>
+            holdings.map(h => {
+                if (h.id === id) {
+                    updated = { ...h, ...update };
+                    return updated;
+                }
+                return h;
+            })
+        );
+
+        if (updated) {
+            this.calculateSummary();
+        }
+
+        return updated;
+    }
+
+    deleteHolding(id: string): void {
+        this.holdings.update(holdings => holdings.filter(h => h.id !== id));
+        this.calculateSummary();
+    }
+
+    getHoldingById(id: string): Holding | undefined {
+        return this.holdings().find(h => h.id === id);
+    }
+    
+    getHoldingsByPortfolio(portfolioId: string): Holding | undefined {
+        return this.holdings().find(h => h.portfolioId === portfolioId);
     }
 }

@@ -30,12 +30,12 @@ export const routes: Routes = [
             {
                 path: ':id',
                 component: PortfolioDetailComponent,
-                children: [
-                    {
-                        path: 'edit',
-                        component: PortfolioFormComponent
-                    }
-                ]
+                // children: [
+                //     {
+                //         path: 'edit',
+                //         component: PortfolioFormComponent
+                //     }
+                // ]
             },
             {
                 path: ':id/edit',

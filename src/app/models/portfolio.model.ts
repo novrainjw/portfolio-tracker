@@ -32,3 +32,17 @@ export interface PortfolioSummary {
     totalGainLoss: number;
     gainLossPercentage: number;
 }
+
+export interface HoldingCreateDto {
+    portfolioId: string;
+    symbol: string;
+    name: string;
+    quantity: number;
+    averagePrice: number;
+    currency: 'USD' | 'CAD';
+    type: 'STOCK' | 'ETF';
+}
+
+export interface HoldingUpdateDto extends Partial<HoldingCreateDto> {
+    currentPrice?: number
+}
