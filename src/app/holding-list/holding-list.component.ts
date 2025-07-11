@@ -3,12 +3,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { PortfolioService } from '../service/portfolio.service';
-import { CurrencyPipe, DecimalPipe, PercentPipe } from '@angular/common';
+import { CommonModule, CurrencyPipe, DecimalPipe, PercentPipe } from '@angular/common';
 import { Holding } from '../models/portfolio.model';
 
 @Component({
   selector: 'app-holding-list',
-  imports: [RouterModule, MatIconModule, MatTableModule, CurrencyPipe, DecimalPipe, PercentPipe],
+  imports: [RouterModule, MatIconModule, MatTableModule, CurrencyPipe, DecimalPipe, PercentPipe, CommonModule],
   templateUrl: './holding-list.component.html',
   styleUrl: './holding-list.component.scss'
 })

@@ -31,35 +31,11 @@ export const routes: Routes = [
             {
                 path: ':id',
                 component: PortfolioDetailComponent,
-                // children: [
-                //     {
-                //         path: 'edit',
-                //         component: PortfolioFormComponent
-                //     }
-                // ]
             },
             {
                 path: ':id/edit',
                 component: PortfolioFormComponent
             }
         ]
-    },
-    {
-  path: 'portfolios/:id/holdings',
-  children: [
-    { 
-      path: '', 
-      component: HoldingListComponent,
-    },
-    // { 
-    //   path: 'new', 
-    //   component: HoldingFormComponent 
-    // },
-    // { 
-    //   path: 'edit/:id', 
-    //   component: HoldingFormComponent 
-    // }
-  ]
-},
-
+    }
 ];
