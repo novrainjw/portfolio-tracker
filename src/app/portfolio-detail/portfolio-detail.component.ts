@@ -8,6 +8,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatTableModule } from '@angular/material/table';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { PortfolioService } from '../service/portfolio.service';
+import { HoldingListComponent } from "../holding-list/holding-list.component";
 
 @Component({
   selector: 'app-portfolio-detail',
@@ -22,8 +23,9 @@ import { PortfolioService } from '../service/portfolio.service';
     MatTableModule,
     CurrencyPipe,
     DatePipe,
-    RouterModule
-  ],
+    RouterModule,
+    HoldingListComponent
+],
   templateUrl: './portfolio-detail.component.html',
   styleUrls: ['./portfolio-detail.component.scss']
 })

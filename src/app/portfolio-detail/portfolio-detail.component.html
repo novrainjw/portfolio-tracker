@@ -4,44 +4,44 @@
       <mat-card-title>{{ portfolio.name }}</mat-card-title>
       <mat-card-subtitle>{{ portfolio.broker }} - {{ portfolio.currency }} Account</mat-card-subtitle>
     </mat-card-header>
-    
+
     <mat-card-content>
       <div class="portfolio-meta">
         <div class="meta-item">
           <span class="label">Created:</span>
           <span>{{ portfolio.createdDate | date }}</span>
         </div>
-        
+
         <div *ngIf="portfolio.description" class="meta-item">
           <span class="label">Description:</span>
           <span>{{ portfolio.description }}</span>
         </div>
       </div>
-      
+
       <mat-divider></mat-divider>
-      
+
       <div class="portfolio-summary">
         <div class="summary-item">
           <div class="label">Total Value</div>
           <div class="value">{{ portfolioSummary().totalValue | currency:portfolio.currency }}</div>
         </div>
-        
+
         <div class="summary-item">
           <div class="label">Total Cost</div>
           <div class="value">{{ portfolioSummary().totalCost | currency:portfolio.currency }}</div>
         </div>
-        
+
         <div class="summary-item">
           <div class="label">Gain/Loss</div>
-          <div class="value" [class.positive]="portfolioSummary().totalGainLoss >= 0" 
-               [class.negative]="portfolioSummary().totalGainLoss < 0">
+          <div class="value" [class.positive]="portfolioSummary().totalGainLoss >= 0"
+            [class.negative]="portfolioSummary().totalGainLoss < 0">
             {{ portfolioSummary().totalGainLoss | currency:portfolio.currency }}
             ({{ portfolioSummary().gainLossPercentage | percent:'1.2-2' }})
           </div>
         </div>
       </div>
     </mat-card-content>
-    
+
     <mat-card-actions>
       <button mat-raised-button color="accent" [routerLink]="['edit']">
         <mat-icon>edit</mat-icon> Edit Portfolio
@@ -51,81 +51,15 @@
       </button>
     </mat-card-actions>
   </mat-card>
-  
+
   <mat-card class="holdings-card">
     <mat-card-header>
       <mat-card-title>Holdings</mat-card-title>
       <mat-card-subtitle>Stocks and ETFs in this portfolio</mat-card-subtitle>
     </mat-card-header>
-    
+
     <mat-card-content>
-      <table mat-table [dataSource]="holdings()" *ngIf="holdings().length; else emptyHoldings">
-        <!-- Symbol Column -->
-        <ng-container matColumnDef="symbol">
-          <th mat-header-cell *matHeaderCellDef> Symbol </th>
-          <td mat-cell *matCellDef="let holding">{{ holding.symbol }}</td>
-        </ng-container>
-        
-        <!-- Name Column -->
-        <ng-container matColumnDef="name">
-          <th mat-header-cell *matHeaderCellDef> Name </th>
-          <td mat-cell *matCellDef="let holding">{{ holding.name }}</td>
-        </ng-container>
-        
-        <!-- Quantity Column -->
-        <ng-container matColumnDef="quantity">
-          <th mat-header-cell *matHeaderCellDef> Quantity </th>
-          <td mat-cell *matCellDef="let holding">{{ holding.quantity }}</td>
-        </ng-container>
-        
-        <!-- Avg Price Column -->
-        <ng-container matColumnDef="avgPrice">
-          <th mat-header-cell *matHeaderCellDef> Avg Cost </th>
-          <td mat-cell *matCellDef="let holding">
-            {{ holding.averagePrice | currency:holding.currency }}
-          </td>
-        </ng-container>
-        
-        <!-- Current Price Column -->
-        <ng-container matColumnDef="currentPrice">
-          <th mat-header-cell *matHeaderCellDef> Current Price </th>
-          <td mat-cell *matCellDef="let holding">
-            {{ holding.currentPrice | currency:holding.currency }}
-          </td>
-        </ng-container>
-        
-        <!-- Value Column -->
-        <ng-container matColumnDef="value">
-          <th mat-header-cell *matHeaderCellDef> Current Value </th>
-          <td mat-cell *matCellDef="let holding">
-            {{ (holding.quantity * holding.currentPrice) | currency:holding.currency }}
-          </td>
-        </ng-container>
-        
-        <!-- Gain/Loss Column -->
-        <ng-container matColumnDef="gainLoss">
-          <th mat-header-cell *matHeaderCellDef> Gain/Loss </th>
-          <td mat-cell *matCellDef="let holding" 
-              [class.positive]="(holding.currentPrice - holding.averagePrice) >= 0"
-              [class.negative]="(holding.currentPrice - holding.averagePrice) < 0">
-            {{ (holding.currentPrice - holding.averagePrice) * holding.quantity | currency:holding.currency }}
-            ({{ ((holding.currentPrice - holding.averagePrice) / holding.averagePrice) | percent:'1.2-2' }})
-          </td>
-        </ng-container>
-        
-        <tr mat-header-row *matHeaderRowDef="holdingColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: holdingColumns;"></tr>
-      </table>
-      
-      <ng-template #emptyHoldings>
-        <div class="empty-state">
-          <mat-icon>inbox</mat-icon>
-          <p>No holdings in this portfolio yet</p>
-          <button mat-raised-button color="primary" (click)="addHolding()">
-            Add Your First Holding
-          </button>
-        </div>
-      </ng-template>
+      <app-holding-list></app-holding-list>
     </mat-card-content>
   </mat-card>
 </ng-container>

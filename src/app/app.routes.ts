@@ -4,6 +4,7 @@ import { Dashboard } from './dashboard/dashboard.component';
 import { PortfolioList } from './portfolio-list/portfolio-list.component';
 import { PortfolioFormComponent } from './portfolio-form/portfolio-form.component';
 import { PortfolioDetailComponent } from './portfolio-detail/portfolio-detail.component';
+import { HoldingListComponent } from './holding-list/holding-list.component';
 
 export const routes: Routes = [
     {
@@ -42,5 +43,23 @@ export const routes: Routes = [
                 component: PortfolioFormComponent
             }
         ]
-    }
+    },
+    {
+  path: 'portfolios/:id/holdings',
+  children: [
+    { 
+      path: '', 
+      component: HoldingListComponent,
+    },
+    // { 
+    //   path: 'new', 
+    //   component: HoldingFormComponent 
+    // },
+    // { 
+    //   path: 'edit/:id', 
+    //   component: HoldingFormComponent 
+    // }
+  ]
+},
+
 ];

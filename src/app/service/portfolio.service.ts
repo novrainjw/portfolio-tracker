@@ -132,7 +132,7 @@ export class PortfolioService {
         return this.holdings().find(h => h.id === id);
     }
     
-    getHoldingsByPortfolio(portfolioId: string): Holding | undefined {
-        return this.holdings().find(h => h.portfolioId === portfolioId);
+    getHoldingsByPortfolio(portfolioId: string): Holding[] {
+        return this.holdings().filter(h => h.portfolioId === portfolioId);
     }
 }

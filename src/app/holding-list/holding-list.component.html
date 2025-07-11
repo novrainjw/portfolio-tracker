@@ -6,7 +6,7 @@
         </button>
     </div>
 
-    <table mat-table [dataSource]="holdings()"  *ngIf="holdings().length; else emptyState">
+    <table mat-table [dataSource]="holdings()" *ngIf="holdings().length; else emptyState">
         <!-- Symbol Column -->
         <ng-container matColumnDef="symbol">
             <th mat-header-cell *matHeaderCellDef> Symbol </th>

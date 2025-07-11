@@ -1,7 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { PortfolioService } from '../service/portfolio.service';
 import { CurrencyPipe, DecimalPipe, PercentPipe } from '@angular/common';
 import { Holding } from '../models/portfolio.model';
@@ -12,13 +12,14 @@ import { Holding } from '../models/portfolio.model';
   templateUrl: './holding-list.component.html',
   styleUrl: './holding-list.component.scss'
 })
-export class HoldingList {
+export class HoldingListComponent {
   private portfolioService = inject(PortfolioService);
   private route = inject(ActivatedRoute);
 
   portfolioId = this.route.snapshot.paramMap.get('id');
-  holdings = computed(() => {
-    this.portfolioId ? this.portfolioService.getHoldingsByPortfolio(this.portfolioId) : []
+
+  holdings = computed(() => { // return are needed or use without{}
+    return this.portfolioId ? this.portfolioService.getHoldingsByPortfolio(this.portfolioId) : []
   });
 
   displayedColumns = ['symbol', 'name', 'quantity', 'avgPrice', 'currentPrice', 'value', 'gainLoss', 'actions'];
