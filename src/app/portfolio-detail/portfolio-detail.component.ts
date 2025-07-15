@@ -76,9 +76,9 @@ export class PortfolioDetailComponent {
     });
   }
 
-  addHolding(): void {
-    this.router.navigate(['/holdings/new'], {
-      queryParams: { portfolioId: this.portfolioId() }
-    });
-  }
+  // addHolding(): void {
+  //   this.router.navigate(['/holdings/new'], {
+  //     queryParams: { portfolioId: this.portfolioId() }
+  //   });
+  // }
 }

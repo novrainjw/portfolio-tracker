@@ -121,6 +121,6 @@ export class HoldingFormComponent implements OnInit {
     //   })
     // }
     // Navigate back to holdings list
-    this.router.navigate(['../'], { relativeTo: this.route });
+    this.router.navigate(['../../'], { relativeTo: this.route });
   }
 }

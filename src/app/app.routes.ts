@@ -55,23 +55,5 @@ export const routes: Routes = [
                 ]
             }
         ]
-    },
-    // {
-    //     path: 'portfolios/:portfolioId/holdings',
-    //     children: [
-    //         {
-    //             path: '',
-    //             component: HoldingListComponent,
-    //         },
-    //         {
-    //             path: 'new',
-    //             component: HoldingFormComponent
-    //         },
-    //         {
-    //             path: 'edit/:id',
-    //             component: HoldingFormComponent
-    //         }
-    //     ]
-    // },
-
+    }
 ];
