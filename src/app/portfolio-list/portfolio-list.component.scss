@@ -59,7 +59,17 @@
       }
     }
     
-    
+    // a {
+    //   color: mat.get-color-from-palette(mat.$indigo-palette, 500);
+    //   text-decoration: none;
+    //   font-weight: 500;
+    //   transition: color 0.2s;
+      
+    //   &:hover {
+    //     color: mat.get-color-from-palette(mat.$indigo-palette, 700);
+    //     text-decoration: underline;
+    //   }
+    // }
     
     .mat-mdc-icon-button {
       width: 36px;
@@ -157,7 +167,13 @@
         }
       }
       
-      
+      // a {
+      //   color: mat.get-color-from-palette(mat.$light-blue-palette, 300);
+        
+      //   &:hover {
+      //     color: mat.get-color-from-palette(mat.$light-blue-palette, 100);
+      //   }
+      // }
     }
     
     .empty-state {

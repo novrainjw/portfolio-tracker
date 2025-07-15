@@ -5,11 +5,11 @@ import { MatTableModule } from '@angular/material/table';
 import { PortfolioService } from '../service/portfolio.service';
 import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
-import { Holding } from '../models/portfolio.model';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-portfolio-list',
-  imports: [MatCardModule, MatIconModule, MatTableModule, RouterLink, DatePipe],
+  imports: [MatCardModule, MatIconModule, MatTableModule, MatButtonModule, RouterLink, DatePipe],
   templateUrl: './portfolio-list.component.html',
   styleUrl: './portfolio-list.component.scss'
 })

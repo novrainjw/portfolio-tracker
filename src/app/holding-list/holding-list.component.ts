@@ -5,10 +5,11 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import { PortfolioService } from '../service/portfolio.service';
 import { CommonModule, CurrencyPipe, DecimalPipe, PercentPipe } from '@angular/common';
 import { Holding } from '../models/portfolio.model';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-holding-list',
-  imports: [RouterModule, MatIconModule, MatTableModule, CurrencyPipe, DecimalPipe, PercentPipe, CommonModule],
+  imports: [RouterModule, MatIconModule, MatTableModule, MatButtonModule, CurrencyPipe, DecimalPipe, PercentPipe, CommonModule],
   templateUrl: './holding-list.component.html',
   styleUrl: './holding-list.component.scss'
 })
