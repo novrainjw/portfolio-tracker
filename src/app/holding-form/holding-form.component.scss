@@ -1,0 +1,34 @@
+.holding-form-card {
+  max-width: 800px;
+  margin: 24px auto;
+  padding: 24px;
+  
+  .form-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+    
+    .form-half {
+      flex: 1;
+    }
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .holding-form-card {
+    padding: 16px;
+    
+    .form-row {
+      flex-direction: column;
+      gap: 16px;
+    }
+  }
+}

@@ -6,7 +6,7 @@ import { Router } from "@angular/router";
 })
 export class AuthService {
     //Signal to track authentication state
-    isAuthenticated = signal(false);
+    isAuthenticated = signal<boolean>(false);
 
     constructor(private router: Router) {
         // check initial auth state from localStorage

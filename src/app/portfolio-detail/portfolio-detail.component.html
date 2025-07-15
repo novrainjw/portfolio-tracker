@@ -1,0 +1,76 @@
+<ng-container *ngIf="portfolio() as portfolio">
+  <mat-card class="portfolio-detail-card">
+    <mat-card-header>
+      <mat-card-title>{{ portfolio.name }}</mat-card-title>
+      <mat-card-subtitle>{{ portfolio.broker }} - {{ portfolio.currency }} Account</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="portfolio-meta">
+        <div class="meta-item">
+          <span class="label">Created:</span>
+          <span>{{ portfolio.createdDate | date }}</span>
+        </div>
+
+        <div *ngIf="portfolio.description" class="meta-item">
+          <span class="label">Description:</span>
+          <span>{{ portfolio.description }}</span>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="portfolio-summary">
+        <div class="summary-item">
+          <div class="label">Total Value</div>
+          <div class="value">{{ portfolioSummary().totalValue | currency:portfolio.currency }}</div>
+        </div>
+
+        <div class="summary-item">
+          <div class="label">Total Cost</div>
+          <div class="value">{{ portfolioSummary().totalCost | currency:portfolio.currency }}</div>
+        </div>
+
+        <div class="summary-item">
+          <div class="label">Gain/Loss</div>
+          <div class="value" [class.positive]="portfolioSummary().totalGainLoss >= 0"
+            [class.negative]="portfolioSummary().totalGainLoss < 0">
+            {{ portfolioSummary().totalGainLoss | currency:portfolio.currency }}
+            ({{ portfolioSummary().gainLossPercentage | percent:'1.2-2' }})
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+
+    <mat-card-actions>
+      <button mat-raised-button color="accent" [routerLink]="['edit']">
+        <mat-icon>edit</mat-icon> Edit Portfolio
+      </button>
+      <!-- <button mat-raised-button color="primary" (click)="addHolding()">
+        <mat-icon>add</mat-icon> Add Holding
+      </button> -->
+    </mat-card-actions>
+  </mat-card>
+
+  <mat-card class="holdings-card">
+    <mat-card-header>
+      <mat-card-title>Holdings</mat-card-title>
+      <mat-card-subtitle>Stocks and ETFs in this portfolio</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <app-holding-list></app-holding-list>
+    </mat-card-content>
+  </mat-card>
+</ng-container>
+
+<ng-container *ngIf="!portfolio()">
+  <mat-card>
+    <mat-card-content>
+      <p>Portfolio not found</p>
+      <button mat-raised-button color="primary" routerLink="/portfolios">
+        Back to Portfolios
+      </button>
+    </mat-card-content>
+  </mat-card>
+</ng-container>

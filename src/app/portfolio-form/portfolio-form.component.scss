@@ -1,0 +1,52 @@
+// src/app/portfolios/portfolio-form/portfolio-form.component.scss
+@use '@angular/material' as mat;
+
+.portfolio-form-card {
+  max-width: 800px;
+  margin: 24px auto;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+
+  mat-card-header {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #eee;
+
+    mat-card-title {
+      font-size: 24px;
+      font-weight: 500;
+    }
+  }
+
+  mat-form-field {
+  mat-label {
+    color: rgba(0, 0, 0, 0.6); // Default label color
+    font-weight: 500;
+    margin-bottom: 4px;
+    display: block; // Ensures proper layout
+  }
+}
+
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 24px;
+  }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+  mat-form-field mat-label {
+    color: rgba(255, 255, 255, 0.7);
+  }
+}
+

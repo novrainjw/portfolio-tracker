@@ -1,0 +1,126 @@
+.holding-list-container {
+  margin-top: 24px;
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    
+    h2 {
+      margin: 0;
+      font-weight: 500;
+    }
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    
+    th {
+      font-weight: 500;
+      text-align: left;
+    }
+    
+    td, th {
+      padding: 12px 16px;
+    }
+    
+    tr {
+      border-bottom: 1px solid #eee;
+      
+      &:hover {
+        background-color: #f9f9f9;
+      }
+    }
+    
+    .symbol {
+      font-weight: 500;
+    }
+    
+    .type-badge {
+      margin-left: 8px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      text-transform: uppercase;
+      
+      &.stock {
+        background-color: #e3f2fd;
+        color: #0d47a1;
+      }
+      
+      &.etf {
+        background-color: #e8f5e9;
+        color: #1b5e20;
+      }
+    }
+    
+    .positive {
+      color: #2e7d32;
+    }
+    
+    .negative {
+      color: #c62828;
+    }
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    background-color: #fafafa;
+    border-radius: 8px;
+    margin-top: 20px;
+    
+    mat-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      color: #bdbdbd;
+      margin-bottom: 16px;
+    }
+    
+    h3 {
+      margin: 0 0 8px 0;
+      color: #424242;
+    }
+    
+    p {
+      margin: 0 0 24px 0;
+      color: #757575;
+    }
+  }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+  .holding-list-container {
+    table {
+      tr:hover {
+        background-color: #333;
+      }
+      
+      .type-badge.stock {
+        background-color: #0d47a1;
+        color: white;
+      }
+      
+      .type-badge.etf {
+        background-color: #1b5e20;
+        color: white;
+      }
+    }
+    
+    .empty-state {
+      background-color: #424242;
+      
+      h3 {
+        color: rgba(255, 255, 255, 0.87);
+      }
+      
+      p {
+        color: rgba(255, 255, 255, 0.6);
+      }
+    }
+  }
+}

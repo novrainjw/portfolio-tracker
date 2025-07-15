@@ -1,4 +1,18 @@
-/* You can add global styles to this file, and also import other style files */
+ /* src/styles.scss */
+   @use '@angular/material' as mat;
+   @include mat.core();
+   
+   html, body { 
+     height: 100%; 
+     margin: 0;
+     font-family: Roboto, "Helvetica Neue", sans-serif; 
+   }
+   
+   * {
+     box-sizing: border-box;
+   }
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+   /* src/styles.scss */
+.mat-mdc-form-field {
+  z-index: 0 !important; /* Fixes stacking context issues */
+}
