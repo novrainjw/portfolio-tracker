@@ -1,0 +1,44 @@
+[
+  {
+    "name": "Tech Portfolio",
+    "description": "Technology focused investments",
+    "totalValue": 150000.00,
+    "holdings": [
+      {
+        "symbol": "AAPL",
+        "name": "Apple Inc.",
+        "quantity": 100,
+        "purchasePrice": 145.30,
+        "currentPrice": 152.55
+      },
+      {
+        "symbol": "MSFT",
+        "name": "Microsoft Corporation",
+        "quantity": 80,
+        "purchasePrice": 280.45,
+        "currentPrice": 299.77
+      }
+    ]
+  },
+  {
+    "name": "Green Energy Portfolio",
+    "description": "Renewable energy companies",
+    "totalValue": 87500.50,
+    "holdings": [
+      {
+        "symbol": "ENPH",
+        "name": "Enphase Energy Inc.",
+        "quantity": 50,
+        "purchasePrice": 210.75,
+        "currentPrice": 225.40
+      },
+      {
+        "symbol": "SEDG",
+        "name": "SolarEdge Technologies",
+        "quantity": 65,
+        "purchasePrice": 305.20,
+        "currentPrice": 295.80
+      }
+    ]
+  }
+]

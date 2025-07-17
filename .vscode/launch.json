@@ -3,6 +3,13 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "type": "java",
+      "name": "PortfolioApplication",
+      "request": "launch",
+      "mainClass": "com.example.portfolio.portfolio_backend.PortfolioApplication",
+      "projectName": "portfolio-backend"
+    },
+    {
       "name": "ng serve",
       "type": "chrome",
       "request": "launch",
