@@ -1,0 +1,20 @@
+<div class="login-container">
+    <mat-card class="login-card">
+        <mat-card-header class="login-header">
+            <mat-card-title>
+                <div class="login-title">
+                    <mat-icon class="login-icon">trending_up</mat-icon>
+                    <span>Portfolio Tracker</span>
+                </div>
+            </mat-card-title>
+            <mat-card-subtitle>Sign in to your account</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content class="login-content">
+            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+                <!-- Username Field-->
+                 <mat-form-field></mat-form-field>
+            </form>
+        </mat-card-content>
+    </mat-card>
+</div>
