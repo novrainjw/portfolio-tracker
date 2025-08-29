@@ -5,10 +5,10 @@
       "username": "admin",
       "password": "admin123",
       "email": "admin@portfolio.com",
-      "firstName": "Portfolio",
-      "lastName": "Admin",
+      "firstName": "Firstname",
+      "lastName": "lastname",
       "createdAt": "2024-01-15T10:30:00.000Z",
-      "lastLoginAt": "2025-08-29T13:30:15.532Z",
+      "lastLoginAt": "2025-08-29T14:24:31.984Z",
       "isActive": true
     },
     {

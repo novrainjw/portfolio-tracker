@@ -1,1 +1,15 @@
-<p>dashboard.component works!</p>
+<div class="dashboard-container">
+    <!--Header Section-->
+    <div class="dashboard-header">
+        <div class="header-content">
+            <div class="welcome-section">
+                <h1 class="dashboard-title">
+                    Welcome back, {{user()?.firstName || 'Investor'}}!
+                </h1>
+                <p class="dashboard-subtitle">
+                    Here's your portfolio performance overview
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
