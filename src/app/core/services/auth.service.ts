@@ -69,7 +69,7 @@ export class AuthService {
         if (storedAuth) {
             try {
                 const authData = JSON.parse(storedAuth);
-                if (authData.expiresAt > Date.now) {
+                if (authData.expiresAt > Date.now()) {
                     this._currentUser.set(authData.user);
                     this._token.set(authData.token);
                 } else {
