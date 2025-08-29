@@ -39,6 +39,7 @@ export class PortfolioService {
     constructor() {
         this.loadBrokers();
     }
+    
 
     // Portfolio Methods
     getUserPortfolios(userId?: string): Observable<Portfolio[]> {
@@ -214,13 +215,21 @@ export class PortfolioService {
     }
 
     // Watchlist methods
-    
+    // getUserWatchlist()
 
     updateHoldingFromTransaction(holdingId: string, newTransaction: Transaction) {
         throw new Error("Method not implemented.");
     }
 
     recalculatePortfolioTotals(portfolioId: string) {
+        throw new Error("Method not implemented.");
+    }
+
+    calculatePortfolioSummary(): any {
+        throw new Error("Method not implemented.");
+    }
+
+    loadBrokers() {
         throw new Error("Method not implemented.");
     }
 }

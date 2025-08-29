@@ -13,8 +13,50 @@
         <mat-card-content class="login-content">
             <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
                 <!-- Username Field-->
-                 <mat-form-field></mat-form-field>
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Username</mat-label>
+                    <input matInput formControlName="username" placeholder="Enter your username" autocomplete="username"
+                        [disabled]="isLoading()">
+                    <mat-icon matSuffix>person</mat-icon>
+                    @if (hasError('username')) {
+                    <mat-error>{{ getErrorMessage('username') }}</mat-error>
+                    }
+                </mat-form-field>
+
+                <!-- Password Field -->
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Password</mat-label>
+                    <input matInput formControlName="password" [type]="hidePassword() ? 'password' : 'text'"
+                        placeholder="Enter your password" autocomplete="current-password" [disabled]="isLoading()">
+                    <button mat-icon-button matSuffix type="button" (click)="togglePasswordVisibility()"
+                        [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword()"
+                        [disabled]="isLoading()">
+                        <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+                    </button>
+                    @if (hasError('password')) {
+                    <mat-error>{{ getErrorMessage('password') }}</mat-error>
+                    }
+                </mat-form-field>
+
+                <!-- Submit Button -->
+                <button mat-raised-button color="primary" type="submit" class="login-button full-width"
+                    [disabled]="isLoading() || loginForm.invalid">
+                    @if (isLoading()) {
+                    <mat-spinner diameter="20" class="login-spinner"></mat-spinner>
+                    <span>Signing in...</span>
+                    } @else {
+                    <mat-icon>login</mat-icon>
+                    <span>Sign In</span>
+                    }
+                </button>
             </form>
         </mat-card-content>
+
+        <mat-card-actions class="login-actions">
+            <div class="demo-credentials">
+                <mat-icon class="info-icon">info</mat-icon>
+                <span>Demo credentials: admin / admin123</span>
+            </div>
+        </mat-card-actions>
     </mat-card>
 </div>
