@@ -10,6 +10,55 @@
                     Here's your portfolio performance overview
                 </p>
             </div>
+
+            <div class="header-actions">
+                <button mat-icon-button (click)="refreshData()" [disabled]="refreshing()" matTooltip="Refresh data">
+                    @if(refreshing()){
+                    <mat-spinner diameter="20"></mat-spinner>
+                    }@else {
+                    <mat-icon>refresh</mat-icon>
+                    }
+                </button>
+
+                <button mat-raised-button color="primary" (click)="createPortfolio()"
+                    class="createcreate-portfolio-btn">
+                    <mat-icon>add</mat-icon>
+                    Create Portfolio
+                </button>
+            </div>
         </div>
     </div>
+
+    <!-- Loading State -->
+    @if (isInitialLoading()) {
+    <div class="loading-container">
+        <mat-spinner diameter="40">
+            <p>Loading your portfolio data...</p>
+        </mat-spinner>
+    </div>
+    }@else {
+    <!-- Portfolio Summary Cards -->
+    <div class="summary-cards">
+        <!-- Total Value Card -->
+        <mat-card class="summary-card total-value">
+            <mat-card-header>
+                <mat-icon mat-card-avatar class="card-icon total-icon">account_balance</mat-icon>
+                <mat-card-title>Total Portfolio Value</mat-card-title>
+                <mat-card-subtitle>Across all portfolios</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+                <div class="metric-value">{{ formatCurrency(totalValue()) }}</div>
+                <div class="metric-change" [class]="getPerformanceClass(totalGainLossPercent())">
+                    <mat-icon class="change-icon">
+                        {{ isPositiveGainLoss() ? 'trending_up' : 'trending_down' }}
+                    </mat-icon>
+                    <span>{{ formatCurrency(totalGainLoss()) }} ({{ formatPercentage(totalGainLossPercent())
+                        }})</span>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        
+    </div>
+    }
 </div>

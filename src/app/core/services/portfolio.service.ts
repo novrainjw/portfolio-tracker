@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { computed, inject, Injectable, signal } from "@angular/core";
 import { AuthService } from "./auth.service";
 import { environment } from "../../../environments/environment";
-import { Broker, CreateHoldingRequest, CreatePortfolioRequest, CreateTransactionRequest, Holding, Portfolio, Transaction, UpdatePortfolioRequest, WatchlistItem } from "../models/portfolio.models";
+import { Broker, CreateHoldingRequest, CreatePortfolioRequest, CreateTransactionRequest, CurrencyAllocation, Holding, Portfolio, PortfolioSummary, SectorAllocation, Transaction, UpdatePortfolioRequest, WatchlistItem } from "../models/portfolio.models";
 import { catchError, Observable, shareReplay, tap } from "rxjs";
 
 @Injectable({
@@ -35,11 +35,13 @@ export class PortfolioService {
     public readonly portfolioSummary = computed(() => this.calculatePortfolioSummary());
     public readonly totalPortfolioValue = computed(() => this._portfolios().reduce((sum, p) => sum + p.totalValue, 0));
     public readonly totalGainLoss = computed(() => this._portfolios().reduce((sum, p) => sum + p.totalGainLoss, 0));
+    public readonly isPositiveGainLoss = computed(() => this.totalGainLoss() >= 0);
+
 
     constructor() {
         this.loadBrokers();
     }
-    
+
 
     // Portfolio Methods
     getUserPortfolios(userId?: string): Observable<Portfolio[]> {
@@ -215,21 +217,93 @@ export class PortfolioService {
     }
 
     // Watchlist methods
-    // getUserWatchlist()
+    getUserWatchlist(): Observable<WatchlistItem[]> {
+        const currentUser = this.authService.currentUser();
+        if (!currentUser) {
+            return new Observable(observer => observer.error('User not authenticated'));
+        }
+
+        return this.http.get<WatchlistItem[]>(`${this.API_URL}/watchlist`, {
+            params: { userId: currentUser.id }
+        }).pipe(
+            tap(watchlist => this._watchlist.set(watchlist))
+        );
+    }
 
     updateHoldingFromTransaction(holdingId: string, newTransaction: Transaction) {
-        throw new Error("Method not implemented.");
+        return;
     }
 
     recalculatePortfolioTotals(portfolioId: string) {
-        throw new Error("Method not implemented.");
+        return;
     }
 
-    calculatePortfolioSummary(): any {
-        throw new Error("Method not implemented.");
+    calculatePortfolioSummary(): PortfolioSummary {
+        const portfolios = this._portfolios();
+        const holdings = this._holdings();
+
+        const totalValue = portfolios.reduce((sum, p) => sum + p.totalValue, 0);
+        const totalCost = portfolios.reduce((sum, p) => sum + p.totalCost, 0);
+        const totalGainLoss = totalValue - totalCost;
+        const totalGainLossPercent = totalCost > 0 ? (totalGainLoss / totalCost) * 100 : 0;
+
+        const topGainer = holdings.length > 0
+            ? holdings.reduce((prev, current) =>
+                prev.gainLossPercent > current.gainLossPercent ? prev : current
+            )
+            : undefined;
+
+        const topLoser = holdings.length > 0
+            ? holdings.reduce((prev, current) =>
+                prev.gainLossPercent < current.gainLossPercent ? prev : current
+            )
+            : undefined;
+
+        // Calculate sector allocation
+        const sectorMap = new Map<string, { value: number; count: number }>();
+        holdings.forEach(holding => {
+            const existing = sectorMap.get(holding.sector) || { value: 0, count: 0 };
+            sectorMap.set(holding.sector, {
+                value: existing.value + holding.currentValue,
+                count: existing.count + 1
+            });
+        });
+
+        const sectorAllocation: SectorAllocation[] = Array.from(sectorMap.entries()).map(([sector, data]) => ({
+            sector,
+            value: data.value,
+            percentage: totalValue > 0 ? (data.value / totalValue) * 100 : 0,
+            count: data.count
+        }));
+
+        // Calculate currency allocation
+        const currencyMap = new Map<string, number>();
+        portfolios.forEach(portfolio => {
+            const existing = currencyMap.get(portfolio.currency) || 0;
+            currencyMap.set(portfolio.currency, existing + portfolio.totalValue);
+        });
+
+        const currencyAllocation: CurrencyAllocation[] = Array.from(currencyMap.entries()).map(([currency, value]) => ({
+            currency: currency as 'USD' | 'CAD',
+            value,
+            percentage: totalValue > 0 ? (value / totalValue) * 100 : 0
+        }));
+
+        return {
+            totalValue,
+            totalCost,
+            totalGainLoss,
+            totalGainLossPercent,
+            portfolioCount: portfolios.length,
+            holdingCount: holdings.length,
+            topGainer,
+            topLoser,
+            sectorAllocation,
+            currencyAllocation
+        };
     }
 
-    loadBrokers() {
-        throw new Error("Method not implemented.");
+    loadBrokers(): void {
+        return;
     }
 }
