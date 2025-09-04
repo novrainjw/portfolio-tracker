@@ -230,6 +230,14 @@ export class PortfolioService {
         );
     }
 
+    removeFromWatchlist(id: string): Observable<void> {
+        return this.http.delete<void>(`${this.API_URL}/watchlist/${id}`).pipe(
+            tap(() => {
+                this._watchlist.update(watchlist => watchlist.filter(w => w.id != id));
+            })
+        );
+    }
+
     updateHoldingFromTransaction(holdingId: string, newTransaction: Transaction) {
         return;
     }

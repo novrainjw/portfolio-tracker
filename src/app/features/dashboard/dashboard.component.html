@@ -58,7 +58,237 @@
             </mat-card-content>
         </mat-card>
 
-        
+        <!-- Portfolios Count Card -->
+        <mat-card class="summary-card">
+            <mat-card-header>
+                <mat-icon mat-card-avatar class="card-icon">folder</mat-icon>
+                <mat-card-title>Active Portfolios</mat-card-title>
+                <mat-card-subtitle>Total managed portfolios</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+                <div class="metric-value">{{ portfolioSummary().portfolioCount }}</div>
+                <div class="metric-detail">{{ portfolioSummary().holdingCount }} total holdings</div>
+            </mat-card-content>
+        </mat-card>
+
+        <!-- Top Performer Card -->
+        @if (portfolioSummary().topGainer; as topGainer) {
+        <mat-card class="summary-card">
+            <mat-card-header>
+                <mat-icon mat-card-avatar class="card-icon positive">trending_up</mat-icon>
+                <mat-card-title>Top Performer</mat-card-title>
+                <mat-card-subtitle>Best performing holding</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+                <div class="metric-symbol">{{ topGainer.symbol }}</div>
+                <div class="metric-change positive">
+                    {{ formatPercentage(topGainer.gainLossPercent) }}
+                </div>
+            </mat-card-content>
+        </mat-card>
+        }
+
+        <!-- Sector Allocation Card -->
+        <mat-card class="summary-card sector-card">
+            <mat-card-header>
+                <mat-icon mat-card-avatar class="card-icon">pie_chart</mat-icon>
+                <mat-card-title>Sector Allocation</mat-card-title>
+                <mat-card-subtitle>Portfolio diversification</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+                <div class="sector-chips">
+                    @for (sector of portfolioSummary().sectorAllocation.slice(0, 3); track sector.sector) {
+                    <mat-chip class="sector-chip" [style.background-color]="getSectorColor(sector.sector) + '20'"
+                        [style.color]="getSectorColor(sector.sector)">
+                        {{ sector.sector }} ({{ sector.percentage.toFixed(1) }}%)
+                    </mat-chip>
+                    }
+                </div>
+            </mat-card-content>
+        </mat-card>
     </div>
+
+    <!-- Main Content Tabs -->
+    <mat-card class="content-card">
+        <mat-card-header>
+            <mat-card-title>Portfolio Overview</mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+            <mat-tab-group (selectedTabChange)="onTabChange($event.index)" [selectedIndex]="selectedTab()">
+                <!-- My Portfolios Tab -->
+                <mat-tab label="My Portfolios">
+                    @if (hasData()) {
+                    <div class="portfolios-grid">
+                        @for (portfolio of portfolios(); track trackByPortfolioId($index, portfolio)) {
+                        <mat-card class="portfolio-item" (click)="viewPortfolio(portfolio)" role="button" tabindex="0">
+                            <mat-card-header>
+                                <mat-card-title class="portfolio-name">{{ portfolio.name }}</mat-card-title>
+                                <mat-card-subtitle>
+                                    {{ portfolio.broker }} • {{ portfolio.currency }}
+                                </mat-card-subtitle>
+
+                                <button mat-icon-button [matMenuTriggerFor]="portfolioMenu"
+                                    (click)="$event.stopPropagation()" class="portfolio-menu">
+                                    <mat-icon>more_vert</mat-icon>
+                                </button>
+
+                                <mat-menu #portfolioMenu="matMenu">
+                                    <button mat-menu-item>
+                                        <mat-icon>edit</mat-icon>
+                                        Edit Portfolio
+                                    </button>
+                                    <button mat-menu-item>
+                                        <mat-icon>trending_up</mat-icon>
+                                        View Performance
+                                    </button>
+                                    <button mat-menu-item>
+                                        <mat-icon>add</mat-icon>
+                                        Add Holding
+                                    </button>
+                                </mat-menu>
+                            </mat-card-header>
+
+                            <mat-card-content>
+                                <div class="portfolio-value">
+                                    {{ formatCurrency(portfolio.totalValue, portfolio.currency) }}
+                                </div>
+
+                                <div class="portfolio-performance"
+                                    [class]="getPerformanceClass(portfolio.totalGainLossPercent)">
+                                    <mat-icon class="performance-icon">
+                                        {{ portfolio.totalGainLoss >= 0 ? 'arrow_upward' : 'arrow_downward' }}
+                                    </mat-icon>
+                                    <span>
+                                        {{ formatCurrency(portfolio.totalGainLoss, portfolio.currency) }}
+                                        ({{ formatPercentage(portfolio.totalGainLossPercent) }})
+                                    </span>
+                                </div>
+
+                                <div class="portfolio-description">
+                                    {{ portfolio.description }}
+                                </div>
+                            </mat-card-content>
+                        </mat-card>
+                        }
+                    </div>
+                    } @else {
+                    <div class="empty-state">
+                        <mat-icon class="empty-icon">folder_open</mat-icon>
+                        <h3>No Portfolios Yet</h3>
+                        <p>Create your first portfolio to start tracking your investments</p>
+                        <button mat-raised-button color="primary" (click)="createPortfolio()">
+                            <mat-icon>add</mat-icon>
+                            Create Your First Portfolio
+                        </button>
+                    </div>
+                    }
+                </mat-tab>
+
+                <!-- Recent Activity Tab -->
+                <mat-tab label="Recent Activity">
+                    <div class="activity-content">
+                        <div class="activity-section">
+                            <h3>Recently Updated Portfolios</h3>
+                            @for (portfolio of recentPortfolios(); track portfolio.id) {
+                            <div class="activity-item">
+                                <mat-icon class="activity-icon">update</mat-icon>
+                                <div class="activity-details">
+                                    <div class="activity-title">{{ portfolio.name }}</div>
+                                    <div class="activity-subtitle">
+                                        Updated {{ portfolio.updatedAt | date:'short' }}
+                                    </div>
+                                </div>
+                                <div class="activity-value">
+                                    {{ formatCurrency(portfolio.totalValue, portfolio.currency) }}
+                                </div>
+                            </div>
+                            } @empty {
+                            <p class="no-activity">No recent portfolio updates</p>
+                            }
+                        </div>
+
+                        <mat-divider></mat-divider>
+
+                        <div class="activity-section">
+                            <h3>Top Performers</h3>
+                            @for (portfolio of topPerformingPortfolios(); track portfolio.id) {
+                            <div class="activity-item">
+                                <mat-icon class="activity-icon"
+                                    [class]="getPerformanceClass(portfolio.totalGainLossPercent)">
+                                    {{ portfolio.totalGainLoss >= 0 ? 'trending_up' : 'trending_down' }}
+                                </mat-icon>
+                                <div class="activity-details">
+                                    <div class="activity-title">{{ portfolio.name }}</div>
+                                    <div class="activity-subtitle">{{ portfolio.broker }}</div>
+                                </div>
+                                <div class="activity-performance"
+                                    [class]="getPerformanceClass(portfolio.totalGainLossPercent)">
+                                    {{ formatPercentage(portfolio.totalGainLossPercent) }}
+                                </div>
+                            </div>
+                            } @empty {
+                            <p class="no-activity">No performance data available</p>
+                            }
+                        </div>
+                    </div>
+                </mat-tab>
+
+                <!-- Watchlist Tab -->
+                <mat-tab label="Watchlist">
+                    <div class="watchlist-header">
+                        <h3>Your Watchlist</h3>
+                        <button mat-raised-button color="accent" (click)="addToWatchlist()">
+                            <mat-icon>add</mat-icon>
+                            Add Stock
+                        </button>
+                    </div>
+
+                    @if (watchlist().length > 0) {
+                    <div class="watchlist-grid">
+                        @for (item of watchlist(); track trackByWatchlistId($index, item)) {
+                        <mat-card class="watchlist-item" (click)="viewStock(item.symbol)">
+                            <mat-card-content>
+                                <div class="watchlist-header-row">
+                                    <div class="stock-symbol">{{ item.symbol }}</div>
+                                    <button mat-icon-button
+                                        (click)="removeFromWatchlist(item); $event.stopPropagation()"
+                                        matTooltip="Remove from watchlist">
+                                        <mat-icon>close</mat-icon>
+                                    </button>
+                                </div>
+
+                                <div class="company-name">{{ item.companyName }}</div>
+
+                                <div class="stock-price">
+                                    {{ formatCurrency(item.currentPrice) }}
+                                </div>
+
+                                <div class="stock-change" [class]="getPerformanceClass(item.changePercent)">
+                                    <mat-icon class="change-icon">
+                                        {{ item.changePercent >= 0 ? 'arrow_upward' : 'arrow_downward' }}
+                                    </mat-icon>
+                                    {{ formatPercentage(item.changePercent) }}
+                                </div>
+                            </mat-card-content>
+                        </mat-card>
+                        }
+                    </div>
+                    } @else {
+                    <div class="empty-state">
+                        <mat-icon class="empty-icon">visibility</mat-icon>
+                        <h3>No Stocks in Watchlist</h3>
+                        <p>Add stocks you're interested in to track their performance</p>
+                        <button mat-raised-button color="accent" (click)="addToWatchlist()">
+                            <mat-icon>add</mat-icon>
+                            Add Your First Stock
+                        </button>
+                    </div>
+                    }
+                </mat-tab>
+            </mat-tab-group>
+        </mat-card-content>
+    </mat-card>
+
     }
 </div>
