@@ -7,17 +7,23 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angula
 import { AuthService, LoginCredentials } from "../../../core/services/auth.service";
 import { Router } from "@angular/router";
 import { MatSnackBar } from "@angular/material/snack-bar";
+import { MatInputModule } from "@angular/material/input";
+import { MatButtonModule } from "@angular/material/button";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 
 @Component({
     selector: 'app-login',
     standalone: true,
     imports: [
-        CommonModule,
-        ReactiveFormsModule,
-        MatCardModule,
-        MatIconModule,
-        MatFormFieldModule
-    ],
+    CommonModule,
+    ReactiveFormsModule,
+    MatCardModule,
+    MatIconModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatProgressSpinnerModule
+],
     templateUrl: './login.component.html',
     styleUrl: './login.component.scss'
 })
