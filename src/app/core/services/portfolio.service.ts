@@ -50,7 +50,7 @@ export class PortfolioService {
             return new Observable(observer => observer.error('User not authenticated'));
         }
 
-        this._isLoading();
+        this._isLoading.set(true);
         return this.http.get<Portfolio[]>(`${this.API_URL}/portfolios`, {
             params: { userId: currentUserId }
         }).pipe(
@@ -73,7 +73,7 @@ export class PortfolioService {
     }
 
     createPortfolio(request: CreatePortfolioRequest): Observable<Portfolio> {
-        const currentUser = this.authService.currentUser;
+        const currentUser = this.authService.currentUser();
 
         if (!currentUser) {
             throw new Error('User not authenticated');
@@ -81,7 +81,7 @@ export class PortfolioService {
 
         const portfolioData: Omit<Portfolio, 'id'> = {
             ...request,
-            userId: currentUser.name,
+            userId: currentUser.id,
             totalValue: 0,
             totalCost: 0,
             totalGainLoss: 0,
@@ -312,6 +312,6 @@ export class PortfolioService {
     }
 
     loadBrokers(): void {
-        return;
+        
     }
 }

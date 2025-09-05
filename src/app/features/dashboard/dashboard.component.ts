@@ -3,7 +3,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { MatButtonModule } from "@angular/material/button";
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { combineLatest, Subject, takeUntil } from 'rxjs';
+import { combineLatest, Observable, Subject, takeUntil } from 'rxjs';
 import { PortfolioService } from '../../core/services/portfolio.service';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
@@ -16,7 +16,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 
 @Component({
-  selector: 'app-dashboard.component',
+  selector: 'app-dashboard',
   imports: [CommonModule, MatButtonModule,
     MatTooltipModule,
     MatProgressSpinnerModule,
@@ -28,7 +28,7 @@ export class DashboardComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly portfolioService = inject(PortfolioService);
   private readonly snackBar = inject(MatSnackBar);
-  private readonly destory$ = new Subject();
+  private readonly destroy$ = new Subject<void>();
 
   //Signals for reactive state
   public readonly isInitialLoading = signal<boolean>(true);
@@ -85,7 +85,7 @@ export class DashboardComponent implements OnInit {
       this.portfolioService.getUserPortfolios(currentUser.id),
       this.portfolioService.getUserWatchlist()
     ]).pipe(
-      takeUntil(this.destory$)
+      takeUntil(this.destroy$)
     ).subscribe({
       next: ([portfolios, watchlist]) => {
         this.isInitialLoading.set(false);
@@ -107,9 +107,35 @@ export class DashboardComponent implements OnInit {
     })
   }
 
-  refreshData(): void {
+  /**
+   * Refresh dashboard data
+   */
+  refreshData(): Promise<void> {
+    const currentUser = this.authService.currentUser();
+    if (!currentUser) return Promise.resolve();
 
+    this.refreshing.set(true);
+
+    return new Promise((resolve) => {
+      combineLatest([
+        this.portfolioService.getUserPortfolios(currentUser.id),
+        this.portfolioService.getUserWatchlist()
+      ]).pipe(
+        takeUntil(this.destroy$)
+      ).subscribe({
+        next: () => {
+          this.refreshing.set(false);
+          resolve();
+        },
+        error: (error) => {
+          this.refreshing.set(false);
+          console.error('Failed to refresh data:', error);
+          resolve();
+        }
+      });
+    });
   }
+
 
   createPortfolio(): void {
 
