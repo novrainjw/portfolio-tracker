@@ -14,6 +14,8 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { Portfolio, WatchlistItem } from '../../core/models/portfolio.models';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatDialog } from '@angular/material/dialog';
+import { CreatePortfolioDialogComponent } from '../portfolio/create-portfolio-dialog.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -28,6 +30,7 @@ export class DashboardComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly portfolioService = inject(PortfolioService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly dialog = inject(MatDialog);
   private readonly destroy$ = new Subject<void>();
 
   //Signals for reactive state
@@ -136,9 +139,61 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-
+  /**
+   * Open create portfolio dialog
+   */
   createPortfolio(): void {
+    const dialogRef = this.dialog.open(CreatePortfolioDialogComponent, {
+      width: '600px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      disableClose: true,
+      autoFocus: true,
+      restoreFocus: true,
+      data: { mode: 'create' }
+    });
 
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // Portfolio was created successfully, refresh data
+        this.refreshData();
+
+        // Show success message with action to view the new portfolio
+        const snackBarRef = this.snackBar.open(
+          `Portfolio "${result.name}" created successfully!`,
+          'View',
+          {
+            duration: 5000,
+            panelClass: 'success-snackbar'
+          }
+        );
+      }
+    });
+  }
+
+  /**
+   * Edit portfolio
+   */
+  editPortfolio(portfolio: Portfolio): void {
+    const dialogRef = this.dialog.open(CreatePortfolioDialogComponent, {
+      width: '600px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      disableClose: true,
+      autoFocus: true,
+      restoreFocus: true,
+      data: {
+        mode: 'edit',
+        portfolio: portfolio
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // Portfolio was updated successfully, refresh data
+        this.refreshData();
+      }
+    });
   }
 
   /**

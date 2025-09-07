@@ -1,0 +1,119 @@
+<div class="dialog-container">
+    <div class="dialog-header">
+        <h2 mat-dialog-title class="dialog-title">
+            <mat-icon class="title-icon">{{isEditMode()?'edit':'add_business'}}</mat-icon>
+        </h2>
+        <button mat-icon-button mat-dialog-close class="close-button" [disabled]="isSubmitting()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+
+    <mat-dialog-content class="dialog-content">
+        <form [formGroup]="portfolioForm" class="portfolio-form">
+            <!-- Portfolio Name -->
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Portfolio Name</mat-label>
+                <input matInput formControlName="name" placeholder="e.g., Growth Portfolio, Retirement Fund"
+                    [disabled]="isSubmitting()" maxlength="100">
+                <mat-icon matSuffix>folder</mat-icon>
+                <mat-hint align="end">{{ getNameLength() }}/100</mat-hint>
+                @if (hasError('name')) {
+                <mat-error>{{ getErrorMessage('name') }}</mat-error>
+                }
+            </mat-form-field>
+
+            <!-- Portfolio Description -->
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Description</mat-label>
+                <textarea matInput formControlName="description"
+                    placeholder="Describe your portfolio strategy and goals..." [disabled]="isSubmitting()" rows="3"
+                    maxlength="500">
+                </textarea>
+                <mat-icon matSuffix>description</mat-icon>
+                <mat-hint align="end">{{ getDescriptionLength() }}/500</mat-hint>
+                @if (hasError('description')) {
+                <mat-error>{{ getErrorMessage('description') }}</mat-error>
+                }
+            </mat-form-field>
+
+            <!-- Broker Selection -->
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Brokerage</mat-label>
+                <mat-select formControlName="broker" [disabled]="isSubmitting()">
+                    <mat-option value="">Select a broker</mat-option>
+                    @for (broker of availableBrokers; track broker.id) {
+                    <mat-option [value]="broker.name">
+                        <div class="broker-option">
+                            
+                            <div class="broker-details">
+                                <div class="broker-name">{{ broker.name }}</div>
+                                <div class="broker-type">{{ broker.type }}</div>
+                            </div>
+                        </div>
+                    </mat-option>
+                    }
+                </mat-select>
+                <mat-icon matSuffix>business</mat-icon>
+                @if (hasError('broker')) {
+                <mat-error>{{ getErrorMessage('broker') }}</mat-error>
+                }
+            </mat-form-field>
+
+            <!-- Currency Selection -->
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Base Currency</mat-label>
+                <mat-select formControlName="currency" [disabled]="isSubmitting()">
+                    @for (currency of availableCurrencies(); track currency.code) {
+                    <mat-option [value]="currency.code">
+                        <div class="currency-option">
+                            <span class="currency-flag">{{ currency.flag }}</span>
+                            <span class="currency-code">{{ currency.code }}</span>
+                            <span class="currency-name">{{ currency.name }}</span>
+                        </div>
+                    </mat-option>
+                    }
+                </mat-select>
+                <mat-icon matSuffix>currency_exchange</mat-icon>
+                @if (hasError('currency')) {
+                <mat-error>{{ getErrorMessage('currency') }}</mat-error>
+                }
+            </mat-form-field>
+
+            <!-- Form Summary -->
+            @if (portfolioForm.valid && !isSubmitting()) {
+            <div class="form-summary">
+                <mat-icon class="summary-icon">check_circle</mat-icon>
+                <div class="summary-content">
+                    <div class="summary-title">Ready to {{ isEditMode() ? 'update' : 'create' }}:</div>
+                    <div class="summary-details">
+                        <strong>{{ portfolioForm.get('name')?.value }}</strong>
+                        with {{ portfolioForm.get('broker')?.value }}
+                        in {{ portfolioForm.get('currency')?.value }}
+                    </div>
+                </div>
+            </div>
+            }
+        </form>
+    </mat-dialog-content>
+
+    <mat-dialog-actions class="dialog-actions">
+        <button mat-button mat-dialog-close [disabled]="isSubmitting()" class="cancel-button">
+            Cancel
+        </button>
+
+        <button 
+          mat-raised-button 
+          color="primary"
+          (click)="onSubmit()"
+          [disabled]="portfolioForm.invalid || isSubmitting()"
+          class="submit-button">
+          @if (isSubmitting()) {
+            <mat-spinner diameter="20" class="submit-spinner"></mat-spinner>
+            <span>{{ isEditMode() ? 'Updating...' : 'Creating...' }}</span>
+          } @else {
+            <mat-icon>{{ isEditMode() ? 'save' : 'add_business' }}</mat-icon>
+            <span>{{ isEditMode() ? 'Update Portfolio' : 'Create Portfolio' }}</span>
+          }
+        </button>
+    </mat-dialog-actions>
+</div>

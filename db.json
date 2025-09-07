@@ -8,7 +8,7 @@
       "firstName": "Firstname",
       "lastName": "lastname",
       "createdAt": "2024-01-15T10:30:00.000Z",
-      "lastLoginAt": "2025-09-04T15:29:43.961Z",
+      "lastLoginAt": "2025-09-06T23:01:01.917Z",
       "isActive": true
     },
     {
@@ -78,6 +78,51 @@
       "totalGainLossPercent": -9.48,
       "createdAt": "2024-03-01T11:15:00.000Z",
       "updatedAt": "2024-08-26T09:30:00.000Z",
+      "isActive": true
+    },
+    {
+      "id": "c9bf",
+      "name": "asdf",
+      "description": "asdfasdfas",
+      "broker": "Questrade",
+      "currency": "USD",
+      "userId": "1",
+      "totalValue": 0,
+      "totalCost": 0,
+      "totalGainLoss": 0,
+      "totalGainLossPercent": 0,
+      "createdAt": "2025-09-06T14:45:33.169Z",
+      "updatedAt": "2025-09-06T14:45:33.169Z",
+      "isActive": true
+    },
+    {
+      "id": "b498",
+      "name": "1234",
+      "description": "123123123123",
+      "broker": "1",
+      "currency": "USD",
+      "userId": "1",
+      "totalValue": 0,
+      "totalCost": 0,
+      "totalGainLoss": 0,
+      "totalGainLossPercent": 0,
+      "createdAt": "2025-09-06T23:01:25.264Z",
+      "updatedAt": "2025-09-06T23:01:25.264Z",
+      "isActive": true
+    },
+    {
+      "id": "5136",
+      "name": "zxcv",
+      "description": "zxcvbzxcvb",
+      "broker": "TD Direct Investing",
+      "currency": "USD",
+      "userId": "1",
+      "totalValue": 0,
+      "totalCost": 0,
+      "totalGainLoss": 0,
+      "totalGainLossPercent": 0,
+      "createdAt": "2025-09-06T23:19:46.648Z",
+      "updatedAt": "2025-09-06T23:19:46.648Z",
       "isActive": true
     }
   ],

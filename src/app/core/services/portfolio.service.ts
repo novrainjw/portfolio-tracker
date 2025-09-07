@@ -89,7 +89,7 @@ export class PortfolioService {
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
             isActive: true
-        };
+        }
 
         return this.http.post<Portfolio>(`${this.API_URL}/portfolios`, portfolioData).pipe(
             tap(newPortfolio => {
@@ -311,7 +311,13 @@ export class PortfolioService {
         };
     }
 
+    // loadBrokers(): Observable<Broker[]> {
+    //     return this.http.get<Broker[]>(`${this.API_URL}/brokers`).pipe(
+    //         tap(brokers=> this._brokers.set(brokers))
+    //     );
+    // }
+
     loadBrokers(): void {
-        
+        this.http.get<Broker[]>(`${this.API_URL}/brokers`).subscribe(brokers => this._brokers.set(brokers));
     }
 }
