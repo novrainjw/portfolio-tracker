@@ -1,25 +1,38 @@
 import { CommonModule } from "@angular/common";
-import { Component, inject, OnInit, signal } from "@angular/core";
+import { Component, Inject, inject, OnInit, signal } from "@angular/core";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
-import { MatDialogModule, MatDialogRef } from "@angular/material/dialog";
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from "@angular/material/dialog";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInput } from "@angular/material/input";
 import { MatSelectModule } from "@angular/material/select";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
-import { CreatePortfolioRequest, Portfolio } from "../../core/models/portfolio.models";
+import { CreatePortfolioRequest, Portfolio, UpdatePortfolioRequest } from "../../core/models/portfolio.models";
 import { PortfolioService } from "../../core/services/portfolio.service";
 import { MatSnackBar } from "@angular/material/snack-bar";
+
+interface DialogData {
+    mode: 'create' | 'edit';
+    portfolio?: Portfolio;
+}
 
 @Component({
     selector: 'app-create-portfolio-dialog',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, MatIconModule, MatButtonModule, MatDialogModule, MatFormFieldModule, MatInput, MatSelectModule, MatProgressSpinnerModule],
+    imports: [CommonModule,
+        ReactiveFormsModule,
+        MatIconModule,
+        MatButtonModule,
+        MatDialogModule,
+        MatFormFieldModule,
+        MatInput,
+        MatSelectModule,
+        MatProgressSpinnerModule],
     templateUrl: './create-portfolio-dialog.component.html',
     styleUrl: './create-portfolio-dialog.component.scss'
 })
-export class CreatePortfolioDialogComponent {
+export class CreatePortfolioDialogComponent implements OnInit {
     private readonly portfolioService = inject(PortfolioService);
     private readonly fb = inject(FormBuilder);
     private readonly snackBar = inject(MatSnackBar);
@@ -34,27 +47,13 @@ export class CreatePortfolioDialogComponent {
 
     // Available options
     public readonly availableBrokers = this.portfolioService.brokers();
-    // public readonly availableBrokers = signal([
-    //     { value: 'Questrade', name: 'Questrade', type: 'Discount Broker', icon: 'trending_up' },
-    //     { value: 'Interactive Brokers', name: 'Interactive Brokers', type: 'Professional', icon: 'analytics' },
-    //     { value: 'TD Direct Investing', name: 'TD Direct Investing', type: 'Full Service', icon: 'account_balance' },
-    //     { value: 'RBC Direct Investing', name: 'RBC Direct Investing', type: 'Full Service', icon: 'account_balance' },
-    //     { value: 'BMO InvestorLine', name: 'BMO InvestorLine', type: 'Full Service', icon: 'account_balance' },
-    //     { value: 'Scotia iTRADE', name: 'Scotia iTRADE', type: 'Discount Broker', icon: 'trending_up' },
-    //     { value: 'CIBC Investor\'s Edge', name: 'CIBC Investor\'s Edge', type: 'Full Service', icon: 'account_balance' },
-    //     { value: 'Wealthsimple Trade', name: 'Wealthsimple Trade', type: 'Commission-Free', icon: 'toll_free' },
-    //     { value: 'Charles Schwab', name: 'Charles Schwab', type: 'Full Service', icon: 'account_balance' },
-    //     { value: 'Fidelity', name: 'Fidelity', type: 'Full Service', icon: 'account_balance' },
-    //     { value: 'E*TRADE', name: 'E*TRADE', type: 'Discount Broker', icon: 'trending_up' },
-    //     { value: 'Robinhood', name: 'Robinhood', type: 'Commission-Free', icon: 'toll_free' }
-    // ]);
 
     public readonly availableCurrencies = signal([
         { code: 'USD', name: 'US Dollar', flag: 'us' },
         { code: 'CAD', name: 'Canadian Dollar', flag: 'CA' }
     ]);
 
-    constructor() {
+    constructor(@Inject(MAT_DIALOG_DATA) private data: DialogData) {
         this.portfolioForm = this.fb.group({
             name: ['', [
                 Validators.required,
@@ -70,6 +69,20 @@ export class CreatePortfolioDialogComponent {
             broker: ['', Validators.required],
             currency: ['USD', Validators.required]
         });
+    }
+
+    ngOnInit(): void {
+        this.isEditMode.set(this.data?.mode === 'edit');
+        // Pre-fill form if editing
+        if (this.isEditMode() && this.data.portfolio) {
+            const portfolio = this.data.portfolio;
+            this.portfolioForm.patchValue({
+                name: portfolio.name,
+                description: portfolio.description,
+                broker: portfolio.broker,
+                currency: portfolio.currency
+            });
+        }
     }
 
     /**
@@ -151,13 +164,25 @@ export class CreatePortfolioDialogComponent {
 
         this.isSubmitting.set(true);
 
+        if (this.isEditMode()) {
+            this.updatePortfolio();
+        } else {
+            this.createPortfolio();
+        }
+    }
+
+    /**
+     * Create new portfolio
+     */
+    private createPortfolio(): void {
         const formValue = this.portfolioForm.value;
+
         const request: CreatePortfolioRequest = {
             name: formValue.name.trim(),
             description: formValue.description.trim(),
             broker: formValue.broker,
             currency: formValue.currency
-        }
+        };
 
         this.portfolioService.createPortfolio(request).subscribe({
             next: (portfolio: Portfolio) => {
@@ -173,16 +198,44 @@ export class CreatePortfolioDialogComponent {
                 this.dialogRef.close(portfolio);
             },
             error: (error) => {
+                this.handleSubmissionError(error, 'create');
+            }
+        });
+    }
+
+    /**
+     * Update existing portfolio
+     */
+    private updatePortfolio(): void {
+        if (!this.data?.portfolio) {
+            this.isSubmitting.set(false);
+            return;
+        }
+
+        const formValue = this.portfolioForm.value;
+        const request: UpdatePortfolioRequest = {
+            id: this.data.portfolio.id,
+            name: formValue.name.trim(),
+            description: formValue.description.trim(),
+            broker: formValue.broker,
+            currency: formValue.currency
+        };
+
+        this.portfolioService.updatePortfolio(request).subscribe({
+            next: (portfolio: Portfolio) => {
                 this.isSubmitting.set(false);
-                console.error('Failed to create portfolio:', error);
                 this.snackBar.open(
-                    error.message || 'Failed to create portfolio. Please try again.',
+                    `Portfolio "${portfolio.name}" updated successfully!`,
                     'Close',
                     {
                         duration: 5000,
-                        panelClass: 'error-snackbar'
+                        panelClass: 'success-snackbar'
                     }
                 );
+                this.dialogRef.close(portfolio);
+            },
+            error: (error) => {
+                this.handleSubmissionError(error, 'update');
             }
         });
     }
@@ -195,5 +248,35 @@ export class CreatePortfolioDialogComponent {
             const control = this.portfolioForm.get(key);
             control?.markAsTouched();
         })
+    }
+
+    /**
+     * Handle submission errors
+     */
+    private handleSubmissionError(error: any, action: 'create' | 'update'): void {
+        this.isSubmitting.set(false);
+        console.error(`Failed to ${action} portfolio. Please try again`);
+
+        let errorMessage = `Failed to {$action} portfolio. Please try again.`
+
+        // Handle specific error types
+        if (error?.status === 409) {
+            errorMessage = 'A portfolio with this name already exists. Please choose a different name.';
+        } else if (error?.status === 400) {
+            errorMessage = error?.error?.message || 'Invalid portfolio data. Please check your inputs.';
+        } else if (error?.status === 403) {
+            errorMessage = 'You do not have permission to perform this action.';
+        } else if (error?.message) {
+            errorMessage = error.message;
+        }
+
+        this.snackBar.open(
+            errorMessage,
+            'Close',
+            {
+                duration: 7000,
+                panelClass: 'error-snackbar'
+            }
+        );
     }
 }
