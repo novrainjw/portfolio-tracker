@@ -25,7 +25,7 @@ interface DialogData {
         MatIconModule,
         MatButtonModule,
         MatDialogModule,
-        MatFormFieldModule,
+        MatFormFieldModule,                                                                 
         MatInput,
         MatSelectModule,
         MatProgressSpinnerModule],

@@ -1,0 +1,468 @@
+<div class="portfolio-detail-container">
+  <!-- Loading State -->
+  @if (isLoading()) {
+  <div class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading portfolio details...</p>
+  </div>
+  }
+
+  <!-- Error State -->
+  @else if (error()) {
+  <div class="error-container">
+    <mat-icon class="error-icon">error_outline</mat-icon>
+    <h3>{{ error() }}</h3>
+    <div class="error-actions">
+      <button mat-raised-button color="primary" (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+        Back to Dashboard
+      </button>
+      <button mat-button (click)="refreshData()">
+        <mat-icon>refresh</mat-icon>
+        Try Again
+      </button>
+    </div>
+  </div>
+  }
+
+  <!-- Portfolio Content -->
+  @else if (portfolio(); as portfolioData) {
+
+  <!-- Header Section -->
+  <div class="portfolio-header">
+    <div class="header-navigation">
+      <button mat-icon-button (click)="goBack()" matTooltip="Back to Dashboard">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="breadcrumb">
+        <span class="breadcrumb-item">Dashboard</span>
+        <mat-icon class="breadcrumb-separator">chevron_right</mat-icon>
+        <span class="breadcrumb-current">{{ portfolioData.name }}</span>
+      </div>
+    </div>
+
+    <div class="header-content">
+      <div class="portfolio-info">
+        <h1 class="portfolio-title">{{ portfolioData.name }}</h1>
+        <p class="portfolio-description">{{ portfolioData.description }}</p>
+
+        <div class="portfolio-meta">
+          <mat-chip class="broker-chip">
+            <mat-icon matChipAvatar>account_balance</mat-icon>
+            {{ portfolioData.broker }}
+          </mat-chip>
+          <mat-chip class="currency-chip">
+            <mat-icon matChipAvatar>attach_money</mat-icon>
+            {{ portfolioData.currency }}
+          </mat-chip>
+          <mat-chip class="date-chip">
+            <mat-icon matChipAvatar>schedule</mat-icon>
+            Created {{ portfolioData.createdAt | date : 'mediumDate' }}
+          </mat-chip>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button mat-icon-button (click)="refreshData()" matTooltip="Refresh data">
+          <mat-icon>refresh</mat-icon>
+        </button>
+
+        <button mat-raised-button color="primary" (click)="addHolding()">
+          <mat-icon>add</mat-icon>
+          Add Holding
+        </button>
+
+        @if (isOwner()) {
+        <button mat-icon-button [matMenuTriggerFor]="portfolioMenu" matTooltip="Portfolio options">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+
+        <mat-menu #portfolioMenu="matMenu">
+          <button mat-menu-item (click)="editPortfolio()">
+            <mat-icon>edit</mat-icon>
+            Edit Portfolio
+          </button>
+          <button mat-menu-item (click)="deletePortfolio()" class="delete-menu-item">
+            <mat-icon>delete</mat-icon>
+            Delete Portfolio
+          </button>
+        </mat-menu>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Portfolio Summary Cards -->
+  <div class="summary-cards">
+    <mat-card class="summary-card total-value">
+      <mat-card-header>
+        <mat-icon mat-card-avatar class="card-icon">account_balance_wallet</mat-icon>
+        <mat-card-title>Total Value</mat-card-title>
+        <mat-card-subtitle>Current market value</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="metric-value">
+          {{ formatCurrency(portfolioData.totalValue, portfolioData.currency) }}
+        </div>
+        <div
+          class="metric-change"
+          [class]="getPerformanceClass(portfolioData.totalGainLossPercent)"
+        >
+          <mat-icon class="change-icon">
+            {{ portfolioData.totalGainLoss >= 0 ? 'trending_up' : 'trending_down' }}
+          </mat-icon>
+          <span
+            >{{ formatCurrency(portfolioData.totalGainLoss, portfolioData.currency) }} ({{
+              formatPercentage(portfolioData.totalGainLossPercent)
+            }})</span
+          >
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="summary-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar class="card-icon">pie_chart</mat-icon>
+        <mat-card-title>Holdings</mat-card-title>
+        <mat-card-subtitle>Total positions</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="metric-value">{{ holdingsSummary().count }}</div>
+        <div class="metric-detail">
+          {{ formatCurrency(holdingsSummary().totalCost, portfolioData.currency) }} invested
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="summary-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar class="card-icon">trending_up</mat-icon>
+        <mat-card-title>Performance</mat-card-title>
+        <mat-card-subtitle>Overall return</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div
+          class="metric-value"
+          [class]="getPerformanceClass(holdingsSummary().totalGainLossPercent)"
+        >
+          {{ formatPercentage(holdingsSummary().totalGainLossPercent) }}
+        </div>
+        <div class="metric-detail">
+          {{ formatCurrency(holdingsSummary().totalGainLoss, portfolioData.currency) }} gain/loss
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="summary-card sector-allocation">
+      <mat-card-header>
+        <mat-icon mat-card-avatar class="card-icon">donut_large</mat-icon>
+        <mat-card-title>Top Sector</mat-card-title>
+        <mat-card-subtitle>Largest allocation</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        @if (sectorAllocation()[0]; as topSector) {
+        <div class="metric-value">{{ topSector.sector }}</div>
+        <div class="metric-detail">
+          {{ formatPercentage(topSector.percentage) }} ({{ topSector.count }} holdings)
+        </div>
+        } @else {
+        <div class="metric-value">No Data</div>
+        <div class="metric-detail">Add holdings to see sectors</div>
+        }
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Main Content Tabs -->
+  <mat-card class="content-card">
+    <mat-tab-group (selectedTabChange)="onTabChange($event.index)" [selectedIndex]="selectedTab()">
+      <!-- Holdings Tab -->
+      <mat-tab label="Holdings">
+        @if (holdings().length > 0) {
+        <div class="holdings-content">
+          <div class="table-container">
+            <table mat-table [dataSource]="holdings()" class="holdings-table">
+              <!-- Symbol Column -->
+              <ng-container matColumnDef="symbol">
+                <th mat-header-cell *matHeaderCellDef>Symbol</th>
+                <td mat-cell *matCellDef="let holding">
+                  <div class="symbol-cell">
+                    <span class="symbol">{{ holding.symbol }}</span>
+                    <span class="type-badge" [attr.data-type]="holding.type">{{
+                      holding.type.toUpperCase()
+                    }}</span>
+                  </div>
+                </td>
+              </ng-container>
+
+              <!-- Company Name Column -->
+              <ng-container matColumnDef="companyName">
+                <th mat-header-cell *matHeaderCellDef>Company</th>
+                <td mat-cell *matCellDef="let holding">
+                  <div class="company-cell">
+                    <span class="company-name">{{ holding.companyName }}</span>
+                    <span class="sector">{{ holding.sector }}</span>
+                  </div>
+                </td>
+              </ng-container>
+
+              <!-- Quantity Column -->
+              <ng-container matColumnDef="quantity">
+                <th mat-header-cell *matHeaderCellDef>Shares</th>
+                <td mat-cell *matCellDef="let holding">
+                  {{ holding.quantity | number : '1.0-2' }}
+                </td>
+              </ng-container>
+
+              <!-- Average Price Column -->
+              <ng-container matColumnDef="averagePrice">
+                <th mat-header-cell *matHeaderCellDef>Avg Price</th>
+                <td mat-cell *matCellDef="let holding">
+                  {{ formatCurrency(holding.averagePrice, holding.currency) }}
+                </td>
+              </ng-container>
+
+              <!-- Current Price Column -->
+              <ng-container matColumnDef="currentPrice">
+                <th mat-header-cell *matHeaderCellDef>Current Price</th>
+                <td mat-cell *matCellDef="let holding">
+                  {{ formatCurrency(holding.currentPrice, holding.currency) }}
+                </td>
+              </ng-container>
+
+              <!-- Current Value Column -->
+              <ng-container matColumnDef="currentValue">
+                <th mat-header-cell *matHeaderCellDef>Market Value</th>
+                <td mat-cell *matCellDef="let holding">
+                  <span class="market-value">{{
+                    formatCurrency(holding.currentValue, holding.currency)
+                  }}</span>
+                </td>
+              </ng-container>
+
+              <!-- Gain/Loss Column -->
+              <ng-container matColumnDef="gainLoss">
+                <th mat-header-cell *matHeaderCellDef>Gain/Loss</th>
+                <td mat-cell *matCellDef="let holding">
+                  <div
+                    class="gain-loss-cell"
+                    [class]="getPerformanceClass(holding.gainLossPercent)"
+                  >
+                    <span class="gain-amount">{{
+                      formatCurrency(holding.gainLoss, holding.currency)
+                    }}</span>
+                    <span class="gain-percent"
+                      >({{ formatPercentage(holding.gainLossPercent) }})</span
+                    >
+                  </div>
+                </td>
+              </ng-container>
+
+              <!-- Actions Column -->
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef></th>
+                <td mat-cell *matCellDef="let holding">
+                  <button mat-icon-button [matMenuTriggerFor]="holdingMenu">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+
+                  <mat-menu #holdingMenu="matMenu">
+                    <button mat-menu-item (click)="editHolding(holding)">
+                      <mat-icon>edit</mat-icon>
+                      Edit Holding
+                    </button>
+                    <button mat-menu-item (click)="removeHolding(holding)" class="delete-menu-item">
+                      <mat-icon>delete</mat-icon>
+                      Remove Holding
+                    </button>
+                  </mat-menu>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="holdingsColumns"></tr>
+              <tr
+                mat-row
+                *matRowDef="let row; columns: holdingsColumns"
+                class="holding-row"
+                [attr.data-symbol]="row.symbol"
+              ></tr>
+            </table>
+          </div>
+        </div>
+        } @else {
+        <div class="empty-state">
+          <mat-icon class="empty-icon">trending_up</mat-icon>
+          <h3>No Holdings Yet</h3>
+          <p>Start building your portfolio by adding your first holding</p>
+          <button mat-raised-button color="primary" (click)="addHolding()">
+            <mat-icon>add</mat-icon>
+            Add Your First Holding
+          </button>
+        </div>
+        }
+      </mat-tab>
+
+      <!-- Transactions Tab -->
+      <mat-tab label="Transactions">
+        @if (transactions().length > 0) {
+        <div class="transactions-content">
+          <div class="table-container">
+            <table mat-table [dataSource]="transactions()" class="transactions-table">
+              <!-- Date Column -->
+              <ng-container matColumnDef="transactionDate">
+                <th mat-header-cell *matHeaderCellDef>Date</th>
+                <td mat-cell *matCellDef="let transaction">
+                  {{ transaction.transactionDate | date : 'shortDate' }}
+                </td>
+              </ng-container>
+
+              <!-- Type Column -->
+              <ng-container matColumnDef="type">
+                <th mat-header-cell *matHeaderCellDef>Type</th>
+                <td mat-cell *matCellDef="let transaction">
+                  <span class="transaction-type" [attr.data-type]="transaction.type">
+                    {{ transaction.type.toUpperCase() }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <!-- Symbol Column -->
+              <ng-container matColumnDef="symbol">
+                <th mat-header-cell *matHeaderCellDef>Symbol</th>
+                <td mat-cell *matCellDef="let transaction">{{ transaction.symbol }}</td>
+              </ng-container>
+
+              <!-- Quantity Column -->
+              <ng-container matColumnDef="quantity">
+                <th mat-header-cell *matHeaderCellDef>Quantity</th>
+                <td mat-cell *matCellDef="let transaction">
+                  {{ transaction.quantity | number : '1.0-2' }}
+                </td>
+              </ng-container>
+
+              <!-- Price Column -->
+              <ng-container matColumnDef="price">
+                <th mat-header-cell *matHeaderCellDef>Price</th>
+                <td mat-cell *matCellDef="let transaction">
+                  {{ formatCurrency(transaction.price, transaction.currency) }}
+                </td>
+              </ng-container>
+
+              <!-- Total Amount Column -->
+              <ng-container matColumnDef="totalAmount">
+                <th mat-header-cell *matHeaderCellDef>Total</th>
+                <td mat-cell *matCellDef="let transaction">
+                  <span [class]="transaction.type === 'sell' ? 'positive' : ''">
+                    {{ formatCurrency(transaction.totalAmount, transaction.currency) }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <!-- Notes Column -->
+              <ng-container matColumnDef="notes">
+                <th mat-header-cell *matHeaderCellDef>Notes</th>
+                <td mat-cell *matCellDef="let transaction">
+                  <span class="transaction-notes">{{ transaction.notes || '—' }}</span>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="transactionsColumns"></tr>
+              <tr
+                mat-row
+                *matRowDef="let row; columns: transactionsColumns"
+                class="transaction-row"
+              ></tr>
+            </table>
+          </div>
+        </div>
+        } @else {
+        <div class="empty-state">
+          <mat-icon class="empty-icon">receipt</mat-icon>
+          <h3>No Transactions Yet</h3>
+          <p>Transaction history will appear here once you add holdings</p>
+        </div>
+        }
+      </mat-tab>
+
+      <!-- Analytics Tab -->
+      <mat-tab label="Analytics">
+        <div class="analytics-content">
+          <div class="analytics-grid">
+            <!-- Sector Allocation -->
+            <mat-card class="analytics-card">
+              <mat-card-header>
+                <mat-card-title>Sector Allocation</mat-card-title>
+                <mat-card-subtitle>Portfolio diversification by sector</mat-card-subtitle>
+              </mat-card-header>
+              <mat-card-content>
+                @if (sectorAllocation().length > 0) {
+                <div class="sector-list">
+                  @for (sector of sectorAllocation(); track sector.sector) {
+                  <div class="sector-item">
+                    <div class="sector-info">
+                      <span class="sector-name">{{ sector.sector }}</span>
+                      <span class="sector-count">{{ sector.count }} holdings</span>
+                    </div>
+                    <div class="sector-metrics">
+                      <span class="sector-value">{{
+                        formatCurrency(sector.value, portfolioData.currency)
+                      }}</span>
+                      <span class="sector-percentage">{{
+                        formatPercentage(sector.percentage)
+                      }}</span>
+                    </div>
+                  </div>
+                  }
+                </div>
+                } @else {
+                <div class="no-data">
+                  <p>Add holdings to see sector allocation</p>
+                </div>
+                }
+              </mat-card-content>
+            </mat-card>
+
+            <!-- Top Holdings -->
+            <mat-card class="analytics-card">
+              <mat-card-header>
+                <mat-card-title>Top Holdings</mat-card-title>
+                <mat-card-subtitle>Largest positions by market value</mat-card-subtitle>
+              </mat-card-header>
+              <mat-card-content>
+                @if (topHoldings().length > 0) {
+                <div class="top-holdings-list">
+                  @for (holding of topHoldings(); track trackByHoldingId($index, holding)) {
+                  <div class="holding-item">
+                    <div class="holding-info">
+                      <span class="holding-symbol">{{ holding.symbol }}</span>
+                      <span class="holding-company">{{ holding.companyName }}</span>
+                    </div>
+                    <div class="holding-metrics">
+                      <span class="holding-value">{{
+                        formatCurrency(holding.currentValue, holding.currency)
+                      }}</span>
+                      <span
+                        class="holding-performance"
+                        [class]="getPerformanceClass(holding.gainLossPercent)"
+                      >
+                        {{ formatPercentage(holding.gainLossPercent) }}
+                      </span>
+                    </div>
+                  </div>
+                  }
+                </div>
+                } @else {
+                <div class="no-data">
+                  <p>Add holdings to see top positions</p>
+                </div>
+                }
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </mat-card>
+
+  }
+</div>

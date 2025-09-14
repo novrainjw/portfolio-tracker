@@ -16,6 +16,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatDialog } from '@angular/material/dialog';
 import { CreatePortfolioDialogComponent } from '../portfolio/create-portfolio-dialog.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
@@ -27,6 +28,7 @@ import { CreatePortfolioDialogComponent } from '../portfolio/create-portfolio-di
   styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent implements OnInit {
+  private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
   private readonly portfolioService = inject(PortfolioService);
   private readonly snackBar = inject(MatSnackBar);
@@ -251,8 +253,7 @@ export class DashboardComponent implements OnInit {
    * Navigate to portfolio details
    */
   viewPortfolio(portfolio: Portfolio): void {
-    // This will navigate to portfolio detail page
-    this.snackBar.open(`Viewing ${portfolio.name} will be available soon`, 'Close', { duration: 3000 });
+    this.router.navigate(['/portfolio', portfolio.id]);
   }
 
   /**
