@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal, Signal } from "@angular/core";
+import { Component, computed, inject, OnInit, signal, Signal } from "@angular/core";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatIconModule } from "@angular/material/icon";
 import { ActivatedRoute, Router } from "@angular/router";
@@ -33,7 +33,7 @@ import { MatTableModule } from "@angular/material/table";
     templateUrl: './portfolio-detail.component.html',
     styleUrl: 'portfolio-detail.component.scss'
 })
-export class PortfolioDetailComponent {
+export class PortfolioDetailComponent implements OnInit{
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
     private readonly portfolioService = inject(PortfolioService);
@@ -96,6 +96,10 @@ export class PortfolioDetailComponent {
         })).sort((a, b) => b.value - a.value);
     });
 
+    ngOnInit(): void {
+        this.loadPortfolioData();
+    }
+
     //TODO computed(()=>) vs computed(()=>{})
     public readonly topHoldings = computed(() =>
         this.holdings()
@@ -138,7 +142,9 @@ export class PortfolioDetailComponent {
                 // Verify user has access to this portfolio
                 const currentUser = this.authService.currentUser();
 
-                if (!currentUser || portfolio.id !== currentUser.id) {
+                if (!currentUser || portfolio.userId !== currentUser.id) {
+                    console.info('portfolio.userId: ' + portfolio.userId);
+                    console.info('currentUser.id: ' + currentUser?.id);
                     this.error.set('You do not have access to this portfolio');
                     this.isLoading.set(false);
                     return;
@@ -200,7 +206,7 @@ export class PortfolioDetailComponent {
                     duration: 5000,
                     panelClass: 'success-snackbar'
                 });
-                this.router.navigate(['/darshboard']);
+                this.router.navigate(['/dashboard']);
             },
             error: (error) => {
                 console.error('Failed to delete portfolio:', error);
