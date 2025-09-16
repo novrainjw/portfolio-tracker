@@ -277,4 +277,8 @@ export class AuthService {
     refreshToken(): Observable<AuthResponse> {
         return throwError(() => new Error('Token refresh not implemented'));
     }
+
+    getToken(): null | string {
+        return this._token();
+    }
 }

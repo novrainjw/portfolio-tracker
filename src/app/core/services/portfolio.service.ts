@@ -238,12 +238,97 @@ export class PortfolioService {
         );
     }
 
+    /**
+     * Update holding from transaction - recalculate averages and totals
+     * @param holdingId 
+     * @param newTransaction 
+     * @returns 
+     */
     updateHoldingFromTransaction(holdingId: string, newTransaction: Transaction) {
-        return;
+        const holdings = this._holdings();
+        const holdingIndex = holdings.findIndex(h => h.id === holdingId);
+
+        if (holdingIndex === -1) return;
+
+        const holding = { ...holdings[holdingIndex] };
+
+        // Get all transactions for this holding
+        const holdingTransactions = this._transactions().filter(t => t.holdingId === holdingId);
+
+        // Recalculate quantity and average price based on all transactions
+        let totalQuantity = 0;
+        let totalCost = 0;
+
+        holdingTransactions.forEach(transaction => {
+            if (transaction.type === 'buy') {
+                totalQuantity += transaction.quantity;
+                totalCost += transaction.quantity * transaction.price;
+            } else if (transaction.type === 'sell') {
+                totalQuantity -= transaction.quantity;
+                // For sells, we don't adjust the average cost basis of remaining shares
+            }
+            // Dividend transactions don't affect quantity or cost basis
+        });
+
+        // Update holding with recalculated values
+        if (totalQuantity > 0) {
+            holding.quantity = totalQuantity;
+            holding.averagePrice = totalCost / totalQuantity;
+            holding.totalCost = totalCost;
+            holding.currentValue = totalQuantity * holding.currentPrice;
+            holding.gainLoss = holding.currentValue - holding.totalCost;
+            holding.gainLossPercent = holding.totalCost > 0 ? (holding.gainLoss / holding.totalCost) * 100 : 0;
+            holding.lastUpdated = new Date().toISOString();
+
+            // Update the holdings array
+            const updatedHoldings = [...holdings];
+            updatedHoldings[holdingIndex] = holding;
+            this._holdings.set(updatedHoldings);
+
+            // Recalculate portfolio totals
+            this.recalculatePortfolioTotals(holding.portfolioId);
+        } else {
+            // If quantity becomes 0 or negative, remove the holding
+            this.removeHolding(holdingId).subscribe();
+        }
     }
 
+    /**
+     * Recalculate portfolio totals based on current holdings
+     * @param portfolioId 
+     * @returns 
+     */
     recalculatePortfolioTotals(portfolioId: string) {
-        return;
+        const portfolios = this._portfolios();
+        const portfolioIndex = portfolios.findIndex(p => p.id === portfolioId);
+
+        if (portfolioIndex === -1) return;
+
+        const portfolio = { ...portfolios[portfolioIndex] };
+        const portfolioHoldings = this._holdings().filter(h => h.portfolioId === portfolioId);
+
+        // Calculate new totals
+        const totalValue = portfolioHoldings.reduce((sum, h) => sum + h.currentValue, 0);
+        const totalCost = portfolioHoldings.reduce((sum, h) => sum + h.totalCost, 0);
+        const totalGainLoss = totalValue - totalCost;
+        const totalGainLossPercent = totalCost > 0 ? (totalGainLoss / totalCost) * 100 : 0;
+
+        // Update portfolio
+        portfolio.totalValue = totalValue;
+        portfolio.totalCost = totalCost;
+        portfolio.totalGainLoss = totalGainLoss;
+        portfolio.totalGainLossPercent = totalGainLossPercent;
+        portfolio.updatedAt = new Date().toISOString();
+
+        // Update the portfolios array
+        const updatedPortfolios = [...portfolios];
+        updatedPortfolios[portfolioIndex] = portfolio;
+        this._portfolios.set(updatedPortfolios);
+
+        // Update selected portfolio if it's the same one
+        if (this._selectedPortfolio()?.id === portfolioId) {
+            this._selectedPortfolio.set(portfolio);
+        }
     }
 
     calculatePortfolioSummary(): PortfolioSummary {
@@ -320,4 +405,29 @@ export class PortfolioService {
     loadBrokers(): void {
         this.http.get<Broker[]>(`${this.API_URL}/brokers`).subscribe(brokers => this._brokers.set(brokers));
     }
+
+//     /**
+//  * Add stock to watchlist
+//  */
+//     addToWatchlist(request: CreateWatchlistRequest): Observable<WatchlistItem> {
+//         const currentUser = this.authService.currentUser();
+//         if (!currentUser) {
+//             return new Observable(observer => observer.error('User not authenticated'));
+//         }
+
+//         const watchlistData: Omit<WatchlistItem, 'id'> = {
+//             userId: currentUser.id,
+//             symbol: request.symbol.toUpperCase(),
+//             companyName: request.companyName,
+//             currentPrice: request.currentPrice,
+//             changePercent: request.changePercent,
+//             addedDate: new Date().toISOString()
+//         };
+
+//         return this.http.post<WatchlistItem>(`${this.API_URL}/watchlist`, watchlistData).pipe(
+//             tap(newItem => {
+//                 this._watchlist.update(watchlist => [...watchlist, newItem]);
+//             })
+//         );
+//     }
 }

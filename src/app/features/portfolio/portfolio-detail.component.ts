@@ -15,6 +15,7 @@ import { CreatePortfolioDialogComponent } from "./create-portfolio-dialog.compon
 import { MatCardModule } from "@angular/material/card";
 import { MatTabsModule } from "@angular/material/tabs";
 import { MatTableModule } from "@angular/material/table";
+import { AddHoldingDialogComponent } from "./add-holding-dialog.component";
 
 @Component({
     selector: 'app-portfolio-detail',
@@ -33,7 +34,7 @@ import { MatTableModule } from "@angular/material/table";
     templateUrl: './portfolio-detail.component.html',
     styleUrl: 'portfolio-detail.component.scss'
 })
-export class PortfolioDetailComponent implements OnInit{
+export class PortfolioDetailComponent implements OnInit {
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
     private readonly portfolioService = inject(PortfolioService);
@@ -263,8 +264,38 @@ export class PortfolioDetailComponent implements OnInit{
      * Add new holding
      */
     addHolding(): void {
-        // TODO: Implement add holding dialog
-        this.snackBar.open('Add holding feature will be implemented soon', 'Close', { duration: 3000 });
+        const portfolio = this.portfolio();
+        if (!portfolio) return;
+
+        const dialogRef = this.dialog.open(AddHoldingDialogComponent, {
+            width: '700px',
+            maxWidth: '95vw',
+            maxHeight: '90vh',
+            disableClose: true,
+            autoFocus: true,
+            restoreFocus: true,
+            data: {
+                mode: 'add',
+                portfolio: portfolio
+            }
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result) {
+                // Holding was added successfully, refresh data
+                this.refreshData();
+
+                // Show success message
+                this.snackBar.open(
+                    `${result.symbol} added to portfolio successfully!`,
+                    'Close',
+                    {
+                        duration: 5000,
+                        panelClass: 'success-snackbar'
+                    }
+                );
+            }
+        });
     }
 
     /**
@@ -272,8 +303,39 @@ export class PortfolioDetailComponent implements OnInit{
      * @param holding 
      */
     editHolding(holding: Holding): void {
-        // TODO: Implement edit holding dialog
-        this.snackBar.open(`Edit ${holding.symbol} feature will be implemented soon`, 'Close', { duration: 3000 });
+        const portfolio = this.portfolio();
+        if (!portfolio) return;
+
+        const dialogRef = this.dialog.open(AddHoldingDialogComponent, {
+            width: '700px',
+            maxWidth: '95vw',
+            maxHeight: '90vh',
+            disableClose: true,
+            autoFocus: true,
+            restoreFocus: true,
+            data: {
+                mode: 'edit',
+                portfolio: portfolio,
+                holding: holding
+            }
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result) {
+                // Holding was updated successfully, refresh data
+                this.refreshData();
+
+                // Show success message
+                this.snackBar.open(
+                    `${result.symbol} updated successfully!`,
+                    'Close',
+                    {
+                        duration: 5000,
+                        panelClass: 'success-snackbar'
+                    }
+                );
+            }
+        });
     }
 
     /**

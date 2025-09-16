@@ -1,0 +1,225 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h2 mat-dialog-title class="dialog-title">
+      <mat-icon class="title-icon">{{ isEditMode() ? 'edit' : 'add_business' }}</mat-icon>
+      {{ isEditMode() ? 'Edit Holding' : 'Add New Holding' }}
+    </h2>
+    <button mat-icon-button mat-dialog-close class="close-button" [disabled]="isSubmitting()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="dialog-content">
+    <form [formGroup]="holdingForm" class="holding-form">
+      <!-- Stock Symbol -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Stock Symbol</mat-label>
+        <input
+          matInput
+          formControlName="symbol"
+          placeholder="e.g., AAPL, TSLA, SHOP.TO"
+          [disabled]="isSubmitting()"
+          (blur)="onSymbolBlur()"
+          style="text-transform: uppercase"
+        />
+        <mat-icon matSuffix>trending_up</mat-icon>
+        @if (hasError('symbol')) {
+        <mat-error>{{ getErrorMessage('symbol') }}</mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Company Name -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Company Name</mat-label>
+        <input
+          matInput
+          formControlName="companyName"
+          placeholder="e.g., Apple Inc., Tesla Inc."
+          [disabled]="isSubmitting()"
+        />
+        <mat-icon matSuffix>business</mat-icon>
+        @if (hasError('companyName')) {
+        <mat-error>{{ getErrorMessage('companyName') }}</mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Type and Market Row -->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Security Type</mat-label>
+          <mat-select formControlName="type" [disabled]="isSubmitting()">
+            <mat-option value="stock">Stock</mat-option>
+            <mat-option value="etf">ETF</mat-option>
+          </mat-select>
+          <mat-icon matSuffix>category</mat-icon>
+          @if (hasError('type')) {
+          <mat-error>{{ getErrorMessage('type') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Market</mat-label>
+          <mat-select formControlName="market" [disabled]="isSubmitting()">
+            <mat-option value="NYSE">NYSE</mat-option>
+            <mat-option value="NASDAQ">NASDAQ</mat-option>
+            <mat-option value="TSX">TSX</mat-option>
+            <mat-option value="TSXV">TSX Venture</mat-option>
+            <mat-option value="OTHER">Other</mat-option>
+          </mat-select>
+          <mat-icon matSuffix>public</mat-icon>
+          @if (hasError('market')) {
+          <mat-error>{{ getErrorMessage('market') }}</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <!-- Currency and Sector Row -->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Currency</mat-label>
+          <mat-select formControlName="currency" [disabled]="isSubmitting()">
+            <mat-option value="USD">USD - US Dollar</mat-option>
+            <mat-option value="CAD">CAD - Canadian Dollar</mat-option>
+          </mat-select>
+          <mat-icon matSuffix>attach_money</mat-icon>
+          @if (hasError('currency')) {
+          <mat-error>{{ getErrorMessage('currency') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Sector</mat-label>
+          <mat-select formControlName="sector" [disabled]="isSubmitting()">
+            @for (sector of availableSectors; track sector) {
+            <mat-option [value]="sector">{{ sector }}</mat-option>
+            }
+          </mat-select>
+          <mat-icon matSuffix>pie_chart</mat-icon>
+          @if (hasError('sector')) {
+          <mat-error>{{ getErrorMessage('sector') }}</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <!-- Quantity and Average Price Row -->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Quantity (Shares)</mat-label>
+          <input
+            matInput
+            formControlName="quantity"
+            type="number"
+            placeholder="0"
+            [disabled]="isSubmitting()"
+            min="0.01"
+            step="0.01"
+          />
+          <mat-icon matSuffix>format_list_numbered</mat-icon>
+          @if (hasError('quantity')) {
+          <mat-error>{{ getErrorMessage('quantity') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Average Price</mat-label>
+          <input
+            matInput
+            formControlName="averagePrice"
+            type="number"
+            placeholder="0.00"
+            [disabled]="isSubmitting()"
+            min="0.01"
+            step="0.01"
+          />
+          <span matPrefix>{{ getCurrencySymbol() }}</span>
+          @if (hasError('averagePrice')) {
+          <mat-error>{{ getErrorMessage('averagePrice') }}</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <!-- Current Price and Purchase Date Row -->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Current Price</mat-label>
+          <input
+            matInput
+            formControlName="currentPrice"
+            type="number"
+            placeholder="0.00"
+            [disabled]="isSubmitting()"
+            min="0.01"
+            step="0.01"
+          />
+          <span matPrefix>{{ getCurrencySymbol() }}</span>
+          @if (hasError('currentPrice')) {
+          <mat-error>{{ getErrorMessage('currentPrice') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Purchase Date</mat-label>
+          <input
+            matInput
+            [matDatepicker]="picker"
+            formControlName="purchaseDate"
+            [disabled]="isSubmitting()"
+          />
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+          @if (hasError('purchaseDate')) {
+          <mat-error>{{ getErrorMessage('purchaseDate') }}</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <!-- Calculated Values Display -->
+      @if (holdingForm.valid && !isSubmitting()) {
+      <div class="calculated-summary">
+        <mat-icon class="summary-icon">calculate</mat-icon>
+        <div class="summary-content">
+          <div class="summary-title">Investment Summary:</div>
+          <div class="summary-grid">
+            <div class="summary-item">
+              <span class="label">Total Cost:</span>
+              <span class="value">{{ formatCurrency(getTotalCost()) }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="label">Current Value:</span>
+              <span class="value">{{ formatCurrency(getCurrentValue()) }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="label">Gain/Loss:</span>
+              <span class="value" [ngClass]="getGainLossClass()">
+                {{ formatCurrency(getGainLoss()) }} ({{ getGainLossPercent() }}%)
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      }
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="dialog-actions">
+    <button mat-button mat-dialog-close [disabled]="isSubmitting()" class="cancel-button">
+      Cancel
+    </button>
+
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="onSubmit()"
+      [disabled]="holdingForm.invalid || isSubmitting()"
+      class="submit-button"
+    >
+      @if (isSubmitting()) {
+      <mat-spinner diameter="20" class="submit-spinner"></mat-spinner>
+      <span>{{ isEditMode() ? 'Updating...' : 'Adding...' }}</span>
+      } @else {
+      <mat-icon>{{ isEditMode() ? 'save' : 'add' }}</mat-icon>
+      <span>{{ isEditMode() ? 'Update Holding' : 'Add Holding' }}</span>
+      }
+    </button>
+  </mat-dialog-actions>
+</div>
